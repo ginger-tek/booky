@@ -1,11 +1,11 @@
-# PHP API Service Starter
+# Booky (Lite)
 
-This is a PHP API service starter based on [Google Cloud Run Quickstart](https://cloud.google.com/run/docs/quickstarts/build-and-deploy/deploy-php-service).
+A small, simple book-keeping app for making invoices and tracking expenses.
 
-## Getting Started
+No database.
 
-To test the service locally, run:
+No build step.
 
-```sh
-php -S localhost:3000 index.php
-```
+Just PHP 8, HTML, Vue ESM, and a JSON file.
+
+Just run `index.php` as a router.
