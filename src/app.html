@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="favicon" href="/logo.svg" />
+  <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2.0.6/css/pico.violet.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <title>Booky</title>
+  <style>
+    .brand {
+      font-weight: bold;
+      font-size: 1.5rem;
+    }
+
+    .bi-logo {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      margin: 0 .15em;
+      vertical-align: -.15em;
+      background: url(/logo.svg);
+    }
+
+    :root:not([data-theme=light]) .bi-logo {
+      filter: invert(.75);
+    }
+
+    button,
+    [role="button"] {
+      white-space: nowrap;
+    }
+
+    .danger {
+      color: #d93526;
+    }
+
+    .success {
+      color: #47a417;
+    }
+
+    a,
+    [role="link"] {
+      cursor: pointer;
+    }
+
+    [role="link"].danger {
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    dialog>article>header h4 {
+      display: inline-block;
+      margin-bottom: 0;
+      margin-right: 1rem;
+    }
+
+    dialog>article {
+      max-width: 1024px;
+    }
+
+    :where(button, [role="button"]).wide {
+      display: block;
+      width: 100%;
+    }
+
+    table :where(input, select) {
+      margin-bottom: 0 !important;
+      width: auto;
+    }
+
+    .fade-enter-active,
+    .fade-leave-active {
+      transition: opacity 0.5s ease;
+    }
+
+    .fade-enter-from,
+    .fade-leave-to {
+      opacity: 0;
+    }
+
+    label:has(:where(input, select, textarea)[required]):before {
+      display: inline;
+      content: "*";
+      color: #d93526;
+    }
+
+    iframe {
+      border: none;
+      border-radius: var(--pico-border-radius);
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body class="container">
+  <div id="app" style="opacity: 0">
+    <header>
+      <nav>
+        <ul>
+          <li class="brand">
+            <i class="bi bi-logo"></i>
+            <span>Booky</span>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <transition name="fade" mode="out-in">
+              <span v-if="idx.invoice == null && idx.client == null && saveState" class="success">
+                <i class="bi bi-floppy-fill"></i>
+                Saved
+              </span>
+            </transition>
+          </li>
+          <li>
+            <details class="dropdown">
+              <summary>
+                <i class="bi bi-file-earmark-arrow-down"></i> Export
+              </summary>
+              <ul dir="rtl">
+                <li>
+                  <a href="/export/csv" download="booky.zip">
+                    CSV (.zip)
+                  </a>
+                </li>
+                <li>
+                  <a href="/data" download="booky.json">
+                    JSON
+                  </a>
+                </li>
+              </ul>
+            </details>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <pv-modal v-model="toggleCreateClient" hide-close>
+      <template #header>
+        <h4>Add New Client</h4>
+      </template>
+      <form @submit.prevent="createClient">
+        <label>Name
+          <input name="name" required />
+        </label>
+        <div class="grid">
+          <button type="submit"><i class="bi bi-plus-lg"></i> Add</button>
+          <button type="reset" class="secondary" @click="toggleCreateClient = false">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </pv-modal>
+
+    <pv-modal v-model="toggleCreateInvoice" hide-close>
+      <template #header>
+        <h4>Create New Invoice</h4>
+      </template>
+      <form @submit.prevent="createInvoice">
+        <label>Summary
+          <input name="summary" required />
+        </label>
+        <div v-if="state.clients.length == 0">
+          <p style="text-align:center">You don't have any clients yet</p>
+          <button type="button" class="wide" @click="toggleCreateClient = true">
+            <i class="bi bi-person-plus-fill"></i> Add a Client
+          </button>
+        </div>
+        <template v-else>
+          <label>Client
+            <select name="clientId" required>
+              <option v-for="c in state.clients" :value="c.id">
+                {{ c.name }}
+              </option>
+            </select>
+          </label>
+          <div class="grid">
+            <button type="submit"><i class="bi bi-plus-lg"></i> Create</button>
+            <button type="reset" class="secondary" @click="toggleCreateInvoice = false">
+              Cancel
+            </button>
+          </div>
+        </template>
+      </form>
+    </pv-modal>
+
+    <pv-modal v-model="toggleCreateInvoiceItem" hide-close>
+      <template #header>
+        <h4>Add Invoice Item</h4>
+      </template>
+      <form @submit.prevent="createInvoiceItem">
+        <label>Summary
+          <input name="summary" required />
+        </label>
+        <label>Type
+          <select name="type" required>
+            <option>Service</option>
+            <option>Product</option>
+            <option>Materials</option>
+            <option>Fee</option>
+          </select>
+        </label>
+        <label>Amount
+          <input name="amount" type="number" placeholder="0.00" step="0.01" min="0" required />
+        </label>
+        <label>Purchase Date
+          <input name="purchaseDate" type="date" />
+        </label>
+        <div class="grid">
+          <button type="submit"><i class="bi bi-plus-lg"></i> Add</button>
+          <button type="reset" class="secondary" @click="toggleCreateInvoiceItem = false">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </pv-modal>
+
+    <pv-modal v-model="toggleEditClient" @closed="onClose(idx.client)">
+      <template #header>
+        <h4>Edit Client</h4>
+        <transition name="fade" mode="out-in">
+          <span v-if="saveState" class="success">
+            <i class="bi bi-floppy-fill"></i>
+            Saved
+          </span>
+        </transition>
+      </template>
+      <form v-if="idx.client != null" @input="autoSaveForm" @submit.prevent="putData">
+        <div class="grid">
+          <label>Name
+            <input v-model="state.clients[idx.client].name" required />
+          </label>
+          <label>Email
+            <input v-model="state.clients[idx.client].email" type="email" required />
+          </label>
+          <label>Phone
+            <input v-model="state.clients[idx.client].phone" />
+          </label>
+        </div>
+        <label>Address
+          <textarea v-model="state.clients[idx.client].address"></textarea>
+        </label>
+      </form>
+      <div role="link" class="danger" @click="deleteClient">
+        <i class="bi bi-trash3-fill"></i> Delete Client
+      </div>
+    </pv-modal>
+
+    <pv-modal v-model="toggleEditInvoice" @closed="onClose(idx.invoice)">
+      <template #header>
+        <h4>Edit Invoice</h4>
+        <transition name="fade" mode="out-in">
+          <span v-if="saveState" class="success">
+            <i class="bi bi-floppy-fill"></i>
+            Saved
+          </span>
+        </transition>
+      </template>
+      <div @click="openPrintPreview" role="link">
+        <i class="bi bi-printer"></i> Print Preview
+      </div>
+      <form v-if="idx.invoice != null" @input="autoSaveForm" @submit.prevent="putData">
+        <div class="grid">
+          <label>Summary
+            <input v-model="state.invoices[idx.invoice].summary" required />
+          </label>
+          <label>Client
+            <select v-model="state.invoices[idx.invoice].clientId" required>
+              <option v-for="c in state.clients" :value="c.id">
+                {{ c.name }}
+              </option>
+            </select>
+          </label>
+        </div>
+        <label>Details
+          <textarea v-model="state.invoices[idx.invoice].details"></textarea>
+        </label>
+        <label>Items</label>
+        <button class="wide" type="button" @click="toggleCreateInvoiceItem = true">
+          <i class="bi bi-plus-square"></i> Add Item
+        </button>
+        <div class="overflow-auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Summary</th>
+                <th>Type</th>
+                <th>Purchase Date</th>
+                <th>Amount</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td v-if="state.invoices[idx.invoice].items.length == 0" colspan="5" style="text-align: center">
+                  No items yet
+                </td>
+              </tr>
+              <tr v-for="i in state.invoices[idx.invoice].items" :key="i.id">
+                <td>
+                  <input v-model="i.summary" required />
+                </td>
+                <td>
+                  <select v-model="i.type" required>
+                    <option>Service</option>
+                    <option>Product</option>
+                    <option>Materials</option>
+                    <option>Fee</option>
+                  </select>
+                </td>
+                <td>
+                  <input v-model="i.purchaseDate" type="date" />
+                </td>
+                <td>
+                  <input v-model.number="i.amount" type="number" step="0.01" min="0" required />
+                </td>
+                <td>
+                  <span role="link" @click="removeItem(i.id)" class="danger">
+                    <i class="bi bi-trash3-fill"></i> Remove</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="grid" style="text-align: center">
+          <div>
+            <b>Amount Due</b>
+            <h4>{{ money(sumAmount(state.invoices[idx.invoice])) }}</h4>
+          </div>
+          <div>
+            <b>Expenses</b>
+            <h4>{{ money(sumExpenses(state.invoices[idx.invoice])) }}</h4>
+          </div>
+          <div>
+            <b>Expected Income</b>
+            <h4>{{ money(sumExpected(state.invoices[idx.invoice])) }}</h4>
+          </div>
+        </div>
+        <div class="grid">
+          <label>Due Date
+            <input v-model="state.invoices[idx.invoice].dueDate" type="date" />
+          </label>
+          <label>Paid Date
+            <input v-model="state.invoices[idx.invoice].paidDate" type="date"
+              @change="state.invoices[idx.invoice].amountPaid = state.invoices[idx.invoice].paidDate ? state.invoices[idx.invoice].amountDue : 0" />
+          </label>
+          <label>Amount Paid
+            <input v-model.number="state.invoices[idx.invoice].amountPaid" step="0.01" min="0" type="number" />
+          </label>
+        </div>
+      </form>
+      <div role="link" class="danger" @click="deleteInvoice">
+        <i class="bi bi-trash3-fill"></i> Delete Invoice
+      </div>
+    </pv-modal>
+
+    <article v-if="loading" aria-busy="true"></article>
+    <pv-tabs v-else stretch>
+      <pv-tab title="Dashboard">
+        <article v-if="state.invoices.length == 0" style="text-align: center">
+          <h4>It's empty in here!</h4>
+          <p>Create some invoices and clients to get started</p>
+        </article>
+        <template v-else>
+          <h4>Monthly</h4>
+          <fieldset role="group">
+            <span role="button" class="secondary" disabled>Reporting Year</span>
+            <select v-model="selectedYear">
+              <option v-for="y in years.toReversed()" :key="y" :value="y">
+                {{ y }}
+              </option>
+            </select>
+          </fieldset>
+          <charty :data="monthToMonth"></charty>
+          <hr />
+          <h4>Annual</h4>
+          <charty :data="yearToYear"></charty>
+        </template>
+      </pv-tab>
+
+      <pv-tab title="Invoices">
+        <label>
+          <button class="wide" @click="toggleCreateInvoice = true">
+            <i class="bi bi-file-earmark-plus"></i> New Invoice
+          </button>
+        </label>
+        <pv-table :items="state.invoices" :fields="invoiceTableFields" filter striped bordered>
+          <template #summary="i">
+            <span role="link" @click="editInvoice(i)">{{ i.summary }}</span>
+          </template>
+          <template #client-id="{clientId}">
+            {{ state.clients.find((c) => c.id === clientId).name }}
+          </template>
+          <template #amount-due="{amountDue,amountPaid}">{{ money(amountDue) }} / {{ money(amountPaid) }}</template>
+          <template #empty>
+            <br>
+            <h4>No invoices yet</h4>
+          </template>
+        </pv-table>
+      </pv-tab>
+
+      <pv-tab title="Clients">
+        <label>
+          <button class="wide" @click="toggleCreateClient = true">
+            <i class="bi bi-person-plus-fill"></i> New Client
+          </button>
+        </label>
+        <pv-table :items="state.clients" :fields="clientTableFields" filter striped bordered>
+          <template #name="c">
+            <span role="link" @click="editClient(c)">{{ c.name }}</span>
+          </template>
+          <template #empty>
+            <br>
+            <h4>No clients yet</h4>
+          </template>
+        </pv-table>
+      </pv-tab>
+
+      <pv-tab title="Expenses">
+        <pv-table :items="expenses" :fields="expenseTableFields" filter striped bordered>
+          <template #amount="{amount}">{{ money(amount) }}</template>
+          <template #empty>
+            <br>
+            <h4>No expenses yet</h4>
+          </template>
+        </pv-table>
+      </pv-tab>
+
+      <pv-tab title="Template">
+        <form @input="autoSaveForm" @submit.prevent="putData">
+          <p>Use the syntax <code>[object.property]</code> to reference data in your invoice template markup below</p>
+          <details class="dropdown">
+            <summary>Insert Reference</summary>
+            <ul>
+              <li><a @click="insertRef">[invoice.id]</a></li>
+              <li><a @click="insertRef">[invoice.summary]</a></li>
+              <li><a @click="insertRef">[invoice.dueDate]</a></li>
+              <li><a @click="insertRef">[invoice.details]</a></li>
+              <li><a @click="insertRef">[client.id]</a></li>
+              <li><a @click="insertRef">[client.name]</a></li>
+              <li><a @click="insertRef">[client.email]</a></li>
+              <li><a @click="insertRef">[client.phone]</a></li>
+              <li><a @click="insertRef">[client.address]</a></li>
+              <li><a @click="insertRef">[itemsTable]</a></li>
+            </ul>
+          </details>
+          <div class="grid">
+            <label>Invoice Template (HTML)
+              <textarea id="markup" v-model="state.template" style="
+                  width: 100%;
+                  height: 60dvh;
+                  font-family: monospace;
+                  font-size: 11pt;
+                ">
+              </textarea>
+            </label>
+            <iframe :src="preview"></iframe>
+          </div>
+        </form>
+      </pv-tab>
+    </pv-tabs>
+
+    <pv-toaster></pv-toaster>
+  </div>
+  <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.js"></script>
+  <script src="/src/app.js" type="module"></script>
+</body>
+
+</html>
