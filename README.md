@@ -1,4 +1,4 @@
-# Booky (Lite)
+# Booky
 
 A small, simple book-keeping app for making invoices and tracking expenses.
 
