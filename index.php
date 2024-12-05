@@ -1,12 +1,12 @@
 <?php
 
-$uri = $_SERVER['REQUEST_URI'];
-$method = $_SERVER['REQUEST_METHOD'];
+require 'vendor/autoload.php';
 
-if (is_file(__DIR__ . $uri) && $uri != '/data.json')
-  return false;
+use GingerTek\Routy;
 
-function csv($arr = [])
+session_start(['read_and_close' => true]);
+
+function toCsv($arr = [])
 {
   if (empty($arr))
     return '';
@@ -17,32 +17,81 @@ function csv($arr = [])
   return join("\n", $csv);
 }
 
-(match ($method . $uri) {
-  'PUT/data' => function () {
-      file_put_contents('data.json', file_get_contents('php://input'));
-      echo json_encode(['result' => true]);
-    },
-  'GET/data' => function () {
-      echo @file_get_contents('data.json') ?: json_encode(['invoices' => [], 'clients' => [], 'template' => '[invoice.summary]']);
-    },
-  'GET/export/csv' => function () {
-      $data = json_decode(file_get_contents('data.json'));
-      $invoices = csv($data->invoices);
-      $clients = csv($data->clients);
-      $expenses = csv(...array_map(fn($i) => array_values(array_filter($i->items, fn($e) => (bool) $e->purchaseDate)), $data->invoices));
-      $path = 'booky.zip';
-      $zip = new ZipArchive;
-      $zip->open($path, ZipArchive::CREATE | ZipArchive::OVERWRITE);
-      $zip->addFromString('invoices.csv', $invoices);
-      $zip->addFromString('clients.csv', $clients);
-      $zip->addFromString('expenses.csv', $expenses);
-      $zip->addFromString('template.html', $data->template);
-      $zip->close();
-      header('content-type: application/zip');
-      echo file_get_contents($path);
-      unlink($path);
-    },
-  default => function () {
-      include 'src/app.html';
-    }
-})();
+function auth(Routy $app)
+{
+  if (!isset($_SESSION['user']))
+    $app->end(401);
+}
+
+$app = new Routy;
+
+$app->post('/signup', function () use ($app) {
+  $body = $app->getBody();
+  $users = json_decode(@file_get_contents('data/users.json') ?: '{}');
+  $user = $users->{$body->username} ?? false;
+  if ($user)
+    $app->sendJson(['error' => 'Username taken']);
+  else {
+    session_start();
+    $user = (object) [
+      'password' => password_hash($body->password, PASSWORD_BCRYPT),
+      'path' => 'data/' . uniqid() . '.json'
+    ];
+    $users->{$body->username} = $user;
+    file_put_contents('data/users.json', json_encode($users));
+    $_SESSION['user'] = (object) [
+      'username' => $body->username,
+      'path' => $user->path
+    ];
+    $app->sendJson($_SESSION['user']);
+  }
+});
+$app->post('/login', function () use ($app) {
+  $body = $app->getBody();
+  $users = json_decode(@file_get_contents('data/users.json') ?: '{}');
+  $user = $users->{$body->username} ?? false;
+  if (!$user || !password_verify($body->password, $user->password))
+    $app->sendJson(['error' => 'Username or password incorrect']);
+  else {
+    session_start();
+    $_SESSION['user'] = (object) [
+      'username' => $body->username,
+      'path' => $user->path
+    ];
+    $app->sendJson($_SESSION['user']);
+  }
+});
+$app->get('/session', fn() => $app->sendJson($_SESSION['user'] ?? null));
+$app->get('/logout', auth(...), function () use ($app) {
+  session_start();
+  session_destroy();
+  $app->redirect('/');
+});
+$app->get('/data', auth(...), function () use ($app) {
+  $app->sendData(@file_get_contents($_SESSION['user']->path) ?: json_encode(['invoices' => [], 'clients' => [], 'template' => '[invoice.summary]']), 'application/json');
+});
+$app->put('/data', auth(...), function () use ($app) {
+  file_put_contents($_SESSION['user']->path, json_encode($app->getBody()));
+  $app->sendJson(['result' => true]);
+});
+$app->get('/export/csv', function () use ($app) {
+  $data = json_decode(file_get_contents($_SESSION['user']->path));
+  $invoices = toCsv($data->invoices);
+  $clients = toCsv($data->clients);
+  $expenses = toCsv(...array_map(fn($i) => array_values(array_filter($i->items, fn($e) => (bool) $e->purchaseDate)), $data->invoices));
+  $path = uniqid(null, true);
+  $zip = new ZipArchive;
+  $zip->open($path, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+  $zip->addFromString('invoices.csv', $invoices);
+  $zip->addFromString('clients.csv', $clients);
+  $zip->addFromString('expenses.csv', $expenses);
+  $zip->addFromString('template.html', $data->template);
+  $zip->close();
+  $zip = file_get_contents($path);
+  unlink($path);
+  $app->sendData($zip, 'application/zip');
+});
+
+$app->group('/assets', fn() => $app->serveStatic('public'));
+$app->get('/', fn() => $app->sendData('public/index.html'));
+$app->end(404);

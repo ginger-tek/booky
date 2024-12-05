@@ -1,102 +1,18 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="favicon" href="/logo.svg" />
+  <title>Booky</title>
+  <link rel="icon" href="/assets/logo.svg" />
   <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2.0.6/css/pico.violet.min.css" />
   <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-  <title>Booky</title>
-  <style>
-    .brand {
-      font-weight: bold;
-      font-size: 1.5rem;
-    }
-
-    .bi-logo {
-      display: inline-block;
-      width: 1em;
-      height: 1em;
-      margin: 0 .15em;
-      vertical-align: -.15em;
-      background: url(/logo.svg);
-    }
-
-    :root:not([data-theme=light]) .bi-logo {
-      filter: invert(.75);
-    }
-
-    button,
-    [role="button"] {
-      white-space: nowrap;
-    }
-
-    .danger {
-      color: #d93526;
-    }
-
-    .success {
-      color: #47a417;
-    }
-
-    a,
-    [role="link"] {
-      cursor: pointer;
-    }
-
-    [role="link"].danger {
-      text-decoration: none;
-      white-space: nowrap;
-    }
-
-    dialog>article>header h4 {
-      display: inline-block;
-      margin-bottom: 0;
-      margin-right: 1rem;
-    }
-
-    dialog>article {
-      max-width: 1024px;
-    }
-
-    :where(button, [role="button"]).wide {
-      display: block;
-      width: 100%;
-    }
-
-    table :where(input, select) {
-      margin-bottom: 0 !important;
-      width: auto;
-    }
-
-    .fade-enter-active,
-    .fade-leave-active {
-      transition: opacity 0.5s ease;
-    }
-
-    .fade-enter-from,
-    .fade-leave-to {
-      opacity: 0;
-    }
-
-    label:has(:where(input, select, textarea)[required]):before {
-      display: inline;
-      content: "*";
-      color: #d93526;
-    }
-
-    iframe {
-      border: none;
-      border-radius: var(--pico-border-radius);
-      width: 100%;
-      height: 100%;
-    }
-  </style>
+  <link rel="stylesheet" href="/assets/styles.css" />
 </head>
 
 <body class="container">
-  <div id="app" style="opacity: 0">
+  <div id="app">
     <header>
       <nav>
         <ul>
@@ -105,7 +21,7 @@
             <span>Booky</span>
           </li>
         </ul>
-        <ul>
+        <ul v-if="session.user">
           <li>
             <transition name="fade" mode="out-in">
               <span v-if="idx.invoice == null && idx.client == null && saveState" class="success">
@@ -129,6 +45,18 @@
                   <a href="/data" download="booky.json">
                     JSON
                   </a>
+                </li>
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details class="dropdown">
+              <summary>
+                <i class="bi bi-person-circle-fill"></i> {{ session.user.username }}
+              </summary>
+              <ul dir="rtl">
+                <li>
+                  <a href="/logout">Logout</a>
                 </li>
               </ul>
             </details>
@@ -194,20 +122,22 @@
         <label>Summary
           <input name="summary" required />
         </label>
-        <label>Type
-          <select name="type" required>
-            <option>Service</option>
-            <option>Product</option>
-            <option>Materials</option>
-            <option>Fee</option>
-          </select>
-        </label>
-        <label>Amount
-          <input name="amount" type="number" placeholder="0.00" step="0.01" min="0" required />
-        </label>
-        <label>Purchase Date
-          <input name="purchaseDate" type="date" />
-        </label>
+        <div class="grid">
+          <label>Type
+            <select name="type" required>
+              <option>Service/Labor</option>
+              <option>Product</option>
+              <option>Materials</option>
+              <option>Fee</option>
+            </select>
+          </label>
+          <label>Amount
+            <input name="amount" type="number" placeholder="0.00" step="0.01" min="0" required />
+          </label>
+          <label>Purchase Date
+            <input name="purchaseDate" type="date" />
+          </label>
+        </div>
         <div class="grid">
           <button type="submit"><i class="bi bi-plus-lg"></i> Add</button>
           <button type="reset" class="secondary" @click="toggleCreateInvoiceItem = false">
@@ -356,9 +286,39 @@
       </div>
     </pv-modal>
 
-    <article v-if="loading" aria-busy="true"></article>
-    <pv-tabs v-else stretch>
-      <pv-tab title="Dashboard">
+    <article v-if="!session.user">
+      <details name="auth" open>
+        <summary>Login</summary>
+        <form @submit.prevent="login">
+          <label>Username
+            <input name="username" type="text" required>
+          </label>
+          <label>Password
+            <input name="password" type="password" required>
+          </label>
+          <button type="submit">Login</button>
+        </form>
+      </details>
+      <hr>
+      <details name="auth">
+        <summary>Signup</summary>
+        <form @submit.prevent="signup">
+          <label>Username
+            <input name="username" type="text" required>
+          </label>
+          <label>Password
+            <input name="password" type="password" required>
+          </label>
+          <button type="submit">Login</button>
+        </form>
+      </details>
+    </article>
+    <pv-tabs v-else-if="session.user" stretch>
+      <pv-tab>
+        <template #title>
+          <i class="bi bi-graph-up"></i>
+          Dashboard
+        </template>
         <article v-if="state.invoices.length == 0" style="text-align: center">
           <h4>It's empty in here!</h4>
           <p>Create some invoices and clients to get started</p>
@@ -380,7 +340,11 @@
         </template>
       </pv-tab>
 
-      <pv-tab title="Invoices">
+      <pv-tab>
+        <template #title>
+          <i class="bi bi-file-earmark-ruled"></i>
+          Invoices
+        </template>
         <label>
           <button class="wide" @click="toggleCreateInvoice = true">
             <i class="bi bi-file-earmark-plus"></i> New Invoice
@@ -401,7 +365,11 @@
         </pv-table>
       </pv-tab>
 
-      <pv-tab title="Clients">
+      <pv-tab>
+        <template #title>
+          <i class="bi bi-people"></i>
+          Clients
+        </template>
         <label>
           <button class="wide" @click="toggleCreateClient = true">
             <i class="bi bi-person-plus-fill"></i> New Client
@@ -418,7 +386,11 @@
         </pv-table>
       </pv-tab>
 
-      <pv-tab title="Expenses">
+      <pv-tab>
+        <template #title>
+          <i class="bi bi-receipt"></i>
+          Expenses
+        </template>
         <pv-table :items="expenses" :fields="expenseTableFields" filter striped bordered>
           <template #amount="{amount}">{{ money(amount) }}</template>
           <template #empty>
@@ -428,7 +400,11 @@
         </pv-table>
       </pv-tab>
 
-      <pv-tab title="Template">
+      <pv-tab>
+        <template #title>
+          <i class="bi bi-code-slash"></i>
+          Template
+        </template>
         <form @input="autoSaveForm" @submit.prevent="putData">
           <p>Use the syntax <code>[object.property]</code> to reference data in your invoice template markup below</p>
           <details class="dropdown">
@@ -456,16 +432,17 @@
                 ">
               </textarea>
             </label>
-            <iframe :src="preview"></iframe>
+            <iframe :srcdoc="preview" style="background:white"></iframe>
           </div>
         </form>
       </pv-tab>
     </pv-tabs>
-
+    <article v-else-if="loading" aria-busy="true"></article>
     <pv-toaster></pv-toaster>
   </div>
-  <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.js"></script>
-  <script src="/src/app.js" type="module"></script>
+  <script src="https://unpkg.com/vue@3.5.13/dist/vue.global.js"></script>
+  <script src="https://unpkg.com/@ginger-tek/picovue@2.0.12/dist/picovue.global.js"></script>
+  <script src="/assets/app.js" type="module"></script>
 </body>
 
 </html>

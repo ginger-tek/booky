@@ -1,5 +1,3 @@
-/.dockerignore
-/.idx
-/.vscode
-/Dockerfile
-/data.json
+.vscode
+data
+/vendor/
