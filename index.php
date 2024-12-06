@@ -3,25 +3,9 @@
 require 'vendor/autoload.php';
 
 use GingerTek\Routy;
+include 'funcs.php';
 
 session_start(['read_and_close' => true]);
-
-function toCsv($arr = [])
-{
-  if (empty($arr))
-    return '';
-  $cols = array_keys(array_filter(get_object_vars($arr[0]), fn($v) => !is_array($v)));
-  $csv = [join(',', $cols)];
-  foreach ($arr as $row)
-    $csv[] = join(',', array_map(fn($c) => is_numeric($row->{$c}) ? $row->{$c} : "\"{$row->{$c} }\"", $cols));
-  return join("\n", $csv);
-}
-
-function auth(Routy $app)
-{
-  if (!isset($_SESSION['user']))
-    $app->end(401);
-}
 
 $app = new Routy;
 
@@ -29,20 +13,20 @@ $app->post('/signup', function () use ($app) {
   $body = $app->getBody();
   $users = json_decode(@file_get_contents('data/users.json') ?: '{}');
   $user = $users->{$body->username} ?? false;
+  if ($body->password !== $body->confirm)
+    $app->sendJson(['error' => 'Passwords do not match']);
   if ($user)
     $app->sendJson(['error' => 'Username taken']);
   else {
-    session_start();
     $user = (object) [
       'password' => password_hash($body->password, PASSWORD_BCRYPT),
-      'path' => 'data/' . uniqid() . '.json'
+      'data' => 'data/' . uniqid() . '.db'
     ];
     $users->{$body->username} = $user;
     file_put_contents('data/users.json', json_encode($users));
-    $_SESSION['user'] = (object) [
-      'username' => $body->username,
-      'path' => $user->path
-    ];
+    session_start();
+    $_SESSION['user'] = (object) ['username' => $body->username];
+    $_SESSION['db'] = $user->data;
     $app->sendJson($_SESSION['user']);
   }
 });
@@ -54,10 +38,8 @@ $app->post('/login', function () use ($app) {
     $app->sendJson(['error' => 'Username or password incorrect']);
   else {
     session_start();
-    $_SESSION['user'] = (object) [
-      'username' => $body->username,
-      'path' => $user->path
-    ];
+    $_SESSION['user'] = (object) ['username' => $body->username];
+    $_SESSION['db'] = $user->data;
     $app->sendJson($_SESSION['user']);
   }
 });
@@ -68,24 +50,44 @@ $app->get('/logout', auth(...), function () use ($app) {
   $app->redirect('/');
 });
 $app->get('/data', auth(...), function () use ($app) {
-  $app->sendData(@file_get_contents($_SESSION['user']->path) ?: json_encode(['invoices' => [], 'clients' => [], 'template' => '[invoice.summary]']), 'application/json');
+  $app->sendJson((new DB)->getData());
 });
 $app->put('/data', auth(...), function () use ($app) {
-  file_put_contents($_SESSION['user']->path, json_encode($app->getBody()));
+  (new DB)->putData($app->getBody());
   $app->sendJson(['result' => true]);
 });
-$app->get('/export/csv', function () use ($app) {
-  $data = json_decode(file_get_contents($_SESSION['user']->path));
+$app->post('/data/:table', function () use ($app) {
+  $db = new DB;
+  $app->sendJson(match ($app->params->table) {
+    'invoices' => $db->createInvoice($app->getBody()),
+    'clients' => $db->createClient($app->getBody()),
+    'items' => $db->createItem($app->getBody()),
+    default => null
+  });
+});
+$app->delete('/data/:table/:id', function () use ($app) {
+  $db = new DB;
+  $app->sendJson(match ($app->params->table) {
+    'invoices' => $db->deleteInvoice($app->params->id),
+    'clients' => $db->deleteClient($app->params->id),
+    'items' => $db->deleteItem($app->params->id),
+    default => null
+  });
+});
+$app->get('/export', function () use ($app) {
+  $db = new DB;
+  $data = $db->getData();
   $invoices = toCsv($data->invoices);
   $clients = toCsv($data->clients);
-  $expenses = toCsv(...array_map(fn($i) => array_values(array_filter($i->items, fn($e) => (bool) $e->purchaseDate)), $data->invoices));
+  $items = toCsv($db->getItems());
   $path = uniqid(null, true);
   $zip = new ZipArchive;
   $zip->open($path, ZipArchive::CREATE | ZipArchive::OVERWRITE);
   $zip->addFromString('invoices.csv', $invoices);
   $zip->addFromString('clients.csv', $clients);
-  $zip->addFromString('expenses.csv', $expenses);
+  $zip->addFromString('items.csv', $items);
   $zip->addFromString('template.html', $data->template);
+  $zip->addFile($_SESSION['db'], 'booky.db');
   $zip->close();
   $zip = file_get_contents($path);
   unlink($path);

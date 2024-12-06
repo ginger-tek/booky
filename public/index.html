@@ -7,6 +7,7 @@
   <title>Booky</title>
   <link rel="icon" href="/assets/logo.svg" />
   <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2.0.6/css/pico.violet.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2.0.6/css/pico.colors.min.css" />
   <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
   <link rel="stylesheet" href="/assets/styles.css" />
 </head>
@@ -35,14 +36,16 @@
               <summary>
                 <i class="bi bi-file-earmark-arrow-down"></i> Export
               </summary>
-              <ul dir="rtl">
+              <ul>
                 <li>
-                  <a href="/export/csv" download="booky.zip">
-                    CSV (.zip)
+                  <a href="/export" download="booky.zip">
+                    <i class="bi bi-file-earmark-zip"></i>
+                    .ZIP File
                   </a>
                 </li>
                 <li>
                   <a href="/data" download="booky.json">
+                    <i class="bi bi-braces"></i>
                     JSON
                   </a>
                 </li>
@@ -248,7 +251,9 @@
                 </td>
                 <td>
                   <span role="link" @click="removeItem(i.id)" class="danger">
-                    <i class="bi bi-trash3-fill"></i> Remove</span>
+                    <i class="bi bi-trash3-fill"></i>
+                    Remove
+                  </span>
                 </td>
               </tr>
             </tbody>
@@ -286,33 +291,43 @@
       </div>
     </pv-modal>
 
-    <article v-if="!session.user">
-      <details name="auth" open>
-        <summary>Login</summary>
-        <form @submit.prevent="login">
-          <label>Username
-            <input name="username" type="text" required>
-          </label>
-          <label>Password
-            <input name="password" type="password" required>
-          </label>
-          <button type="submit">Login</button>
-        </form>
-      </details>
-      <hr>
-      <details name="auth">
-        <summary>Signup</summary>
-        <form @submit.prevent="signup">
-          <label>Username
-            <input name="username" type="text" required>
-          </label>
-          <label>Password
-            <input name="password" type="password" required>
-          </label>
-          <button type="submit">Login</button>
-        </form>
-      </details>
-    </article>
+    <div v-if="!session.user" style="margin-inline:auto;max-inline-size:400px">
+      <article>
+        <details name="auth" open>
+          <summary>
+            <h4>Login</h4>
+          </summary>
+          <form @submit.prevent="login">
+            <label>Username
+              <input name="username" type="text" required>
+            </label>
+            <label>Password
+              <input name="password" type="password" required>
+            </label>
+            <button type="submit">Login</button>
+          </form>
+        </details>
+      </article>
+      <article>
+        <details name="auth">
+          <summary>
+            <h4>Signup</h4>
+          </summary>
+          <form @submit.prevent="signup">
+            <label>Username
+              <input name="username" type="text" required>
+            </label>
+            <label>Password
+              <input name="password" type="password" required>
+            </label>
+            <label>Confirm Password
+              <input name="confirm" type="password" required>
+            </label>
+            <button type="submit">Signup</button>
+          </form>
+        </details>
+      </article>
+    </div>
     <pv-tabs v-else-if="session.user" stretch>
       <pv-tab>
         <template #title>
@@ -437,7 +452,6 @@
         </form>
       </pv-tab>
     </pv-tabs>
-    <article v-else-if="loading" aria-busy="true"></article>
     <pv-toaster></pv-toaster>
   </div>
   <script src="https://unpkg.com/vue@3.5.13/dist/vue.global.js"></script>

@@ -41,11 +41,7 @@ const sumExpected = (inv) => {
   return inv.amountDue - sumExpenses(inv)
 }
 
-const uniqid = (prefix = '') => {
-  return (prefix + crypto.randomUUID().replaceAll('-', '').toUpperCase()).slice(0, 8)
-}
-
-import "https://unpkg.com/chart.js@4.4.4/dist/chart.umd.js"
+import "https://unpkg.com/chart.js@4.4.7/dist/chart.umd.js"
 const Charty = {
   props: {
     type: {
@@ -127,7 +123,7 @@ Vue.createApp({
 
     const invoiceTableFields = [
       "summary",
-      "clientId",
+      { name: "clientId", label: "Client" },
       "dueDate",
       "paidDate",
       { name: "amountDue", label: "Due / Paid" },
@@ -144,7 +140,7 @@ Vue.createApp({
         state.clients = clients
         state.template = template
       } catch (ex) {
-        appendToast("Failed to get data", { type: "error" })
+        appendToast("Failed to get data", { type: 'danger' })
       } finally {
         loading.value = false
       }
@@ -161,7 +157,7 @@ Vue.createApp({
         saveState.value = result
         setTimeout(() => (saveState.value = false), 3000)
       } catch (ex) {
-        appendToast(ex.toString(), { type: "error" })
+        appendToast(ex.toString(), { type: 'danger' })
       } finally {
         saving.value = false
       }
@@ -177,60 +173,57 @@ Vue.createApp({
       }, 1000)
     }
 
-    function createClient(ev) {
+    async function createClient(ev) {
       toggleCreateClient.value = false
-      state.clients.push({
-        id: uniqid(),
-        name: ev.target.name.value,
-        email: null,
-        phone: null,
-        address: null,
-        company: null,
-        created: Date.now(),
-        updated: Date.now(),
-      })
+      const client = await fetch('/data/clients', {
+        method: 'POST', headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: ev.target.name.value,
+        })
+      }).then(r => r.json())
+      state.clients.push(client)
       idx.client = state.clients.length - 1
       ev.target.reset()
       if (!toggleCreateInvoice.value)
         toggleEditClient.value = true
-      Vue.nextTick(putData)
     }
 
-    function createInvoice(ev) {
+    async function createInvoice(ev) {
       toggleCreateInvoice.value = false
-      state.invoices.push({
-        id: uniqid('INV'),
-        summary: ev.target.summary.value,
-        clientId: ev.target.clientId.value,
-        details: null,
-        amountDue: 0,
-        dueDate: null,
-        amountPaid: 0,
-        paidDate: null,
-        created: Date.now(),
-        updated: Date.now(),
-        items: [],
-      })
+      const invoice = await fetch('/data/invoices', {
+        method: 'POST', headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          summary: ev.target.summary.value,
+          clientId: ev.target.clientId.value,
+        })
+      }).then(r => r.json())
+      state.invoices.push(invoice)
       idx.invoice = state.invoices.length - 1
       ev.target.reset()
       toggleEditInvoice.value = true
-      Vue.nextTick(putData)
     }
 
-    function createInvoiceItem(ev) {
+    async function createInvoiceItem(ev) {
       toggleCreateInvoiceItem.value = false
-      state.invoices[idx.invoice].items.push({
-        id: uniqid(),
-        summary: ev.target.summary.value,
-        type: ev.target.type.value,
-        amount: parseFloat(ev.target.amount.value),
-        purchaseDate: ev.target.purchaseDate.value,
-        created: Date.now(),
-        updated: Date.now(),
-      })
+      const item = await fetch('/data/items', {
+        method: 'POST', headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          invoiceId: state.invoices[idx.invoice].id,
+          summary: ev.target.summary.value,
+          type: ev.target.type.value,
+          amount: parseFloat(ev.target.amount.value),
+          purchaseDate: ev.target.purchaseDate.value,
+        })
+      }).then(r => r.json())
+      state.invoices[idx.invoice].items.push(item)
       ev.target.reset()
       toggleCreateInvoiceItem.value = false
-      Vue.nextTick(putData)
     }
 
     function editClient(c) {
@@ -238,7 +231,7 @@ Vue.createApp({
       toggleEditClient.value = true
     }
 
-    function deleteClient() {
+    async function deleteClient() {
       if (
         !confirm(
           `Are you sure you want to delete ${state.clients[idx.client].name}?`,
@@ -255,10 +248,10 @@ Vue.createApp({
         return
       }
       toggleEditClient.value = false
+      await fetch(`/data/clients/${state.clients[idx.client].id}`, { method: 'DELETE' }).then(r => r.json())
       setTimeout(async () => {
         state.clients.splice(idx.client, 1)
         idx.client = null
-        Vue.nextTick(putData)
         appendToast("Client deleted", { type: "success" })
       }, 500)
     }
@@ -268,12 +261,12 @@ Vue.createApp({
       toggleEditInvoice.value = true
     }
 
-    function removeItem(id) {
+    async function removeItem(id) {
+      await fetch(`/data/items/${id}`, { method: 'DELETE' }).then(r => r.json())
       state.invoices[idx.invoice].items.splice(
         state.invoices[idx.invoice].items.findIndex((i) => i.id == id),
         1,
       )
-      Vue.nextTick(putData)
     }
 
     function openPrintPreview() {
@@ -284,17 +277,17 @@ Vue.createApp({
       win.close()
     }
 
-    function deleteInvoice() {
+    async function deleteInvoice() {
       if (
         !confirm(
           `Are you sure you want to delete ${state.invoices[idx.invoice].summary}?`,
         )
       )
         return
+      await fetch(`/data/invoices/${state.invoices[idx.invoice].id}`, { method: 'DELETE' }).then(r => r.json())
       toggleEditInvoice.value = false
       setTimeout(async () => {
         state.invoices.splice(idx.invoice, 1)
-        Vue.nextTick(putData)
         idx.invoice = null
         appendToast("Invoice deleted", { type: "success" })
       }, 200)
@@ -306,7 +299,7 @@ Vue.createApp({
 
     function insertRef(ev) {
       state.template += `\n${ev.target.innerText}`
-      e.target.closest('details').removeAttribute('open')
+      ev.target.closest('details').removeAttribute('open')
       Vue.nextTick(() => document.getElementById('markup').focus())
     }
 
