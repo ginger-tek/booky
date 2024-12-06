@@ -2,21 +2,27 @@
 
 use GingerTek\Routy;
 
-function toCsv($arr = []): string
+class Utils
 {
-  if (empty($arr))
-    return '';
-  $cols = array_keys(array_filter(get_object_vars($arr[0]), fn($v) => !is_array($v)));
-  $csv = [join(',', $cols)];
-  foreach ($arr as $row)
-    $csv[] = join(',', array_map(fn($c) => is_numeric($row->{$c}) ? $row->{$c} : "\"{$row->{$c} }\"", $cols));
-  return join("\n", $csv);
+  static function toCsv($arr = []): string
+  {
+    if (empty($arr))
+      return '';
+    $cols = array_keys(array_filter(get_object_vars($arr[0]), fn($v) => !is_array($v)));
+    $csv = [join(',', $cols)];
+    foreach ($arr as $row)
+      $csv[] = join(',', array_map(fn($c) => is_numeric($row->{$c}) ? $row->{$c} : "\"{$row->{$c} }\"", $cols));
+    return join("\n", $csv);
+  }
 }
 
-function auth(Routy $app)
+class Middleware
 {
-  if (!isset($_SESSION['user']))
-    $app->end(401);
+  static function auth(Routy $app)
+  {
+    if (!isset($_SESSION['user']))
+      $app->end(401);
+  }
 }
 
 class DB

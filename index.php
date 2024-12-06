@@ -3,7 +3,7 @@
 require 'vendor/autoload.php';
 
 use GingerTek\Routy;
-include 'funcs.php';
+include 'classes.php';
 
 session_start(['read_and_close' => true]);
 
@@ -44,15 +44,15 @@ $app->post('/login', function () use ($app) {
   }
 });
 $app->get('/session', fn() => $app->sendJson($_SESSION['user'] ?? null));
-$app->get('/logout', auth(...), function () use ($app) {
+$app->get('/logout', Middleware::auth(...), function () use ($app) {
   session_start();
   session_destroy();
   $app->redirect('/');
 });
-$app->get('/data', auth(...), function () use ($app) {
+$app->get('/data', Middleware::auth(...), function () use ($app) {
   $app->sendJson((new DB)->getData());
 });
-$app->put('/data', auth(...), function () use ($app) {
+$app->put('/data', Middleware::auth(...), function () use ($app) {
   (new DB)->putData($app->getBody());
   $app->sendJson(['result' => true]);
 });
@@ -77,9 +77,9 @@ $app->delete('/data/:table/:id', function () use ($app) {
 $app->get('/export', function () use ($app) {
   $db = new DB;
   $data = $db->getData();
-  $invoices = toCsv($data->invoices);
-  $clients = toCsv($data->clients);
-  $items = toCsv($db->getItems());
+  $invoices = Utils::toCsv($data->invoices);
+  $clients = Utils::toCsv($data->clients);
+  $items = Utils::toCsv($db->getItems());
   $path = uniqid(null, true);
   $zip = new ZipArchive;
   $zip->open($path, ZipArchive::CREATE | ZipArchive::OVERWRITE);
