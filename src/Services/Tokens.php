@@ -28,7 +28,7 @@ class Tokens
     try {
       return JWT::decode($token, new Key(self::$secret, 'HS256'));
     } catch(\Exception $ex) {
-      return $null;
+      return null;
     }
   }
 }
