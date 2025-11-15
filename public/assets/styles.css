@@ -1,0 +1,39 @@
+:root {
+  --pico-red: #AF291D;
+}
+
+body>header {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+article.alert {
+  &:empty {
+    display: none;
+  }
+
+  &.danger {
+    background: var(--pico-red);
+    color: var(--pico-color-inverse);
+  }
+}
+
+:has(a.stretch) {
+  position: relative;
+
+  .stretch {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+  }
+}
+
+nav ul li:has(hr) {
+  padding: 0 !important;
+
+  >hr {
+    line-height: .25em;
+  }
+}
