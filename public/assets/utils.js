@@ -1,4 +1,4 @@
-export function sumbmitBusy() {
+export function submitBusy() {
   document.querySelectorAll('form').forEach(frm => {
     frm.addEventListener('submit', () => {
       const btn = frm.querySelector('[type=submit]')

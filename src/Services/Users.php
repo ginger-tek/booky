@@ -2,25 +2,29 @@
 
 namespace App\Services;
 
-class Users extends Service {
+class Users extends Service
+{
   public function create(string $username, string $passhash): ?object
   {
-    $this->db->run("insert into users(username,passhash)
-    values(?,?)", [
+    $id = uniqid();
+    $this->db->run("insert into users(id,username,passhash)
+    values(?,?,?)", [
+      $id,
       $username,
       $passhash
     ]);
-    return $this->get($this->db->lastInsertId());
+    return $this->get($id);
   }
 
-  public function get(int|string $id): ?object
+  public function get(string $id): ?object
   {
     return $this->db->run("select *
     from users
     where id = ?", [$id])->fetch() ?: null;
   }
 
-  public function find(string $username): ?object {
+  public function find(string $username): ?object
+  {
     return $this->db->run("select *
     from users
     where username = ?", [$username])->fetch() ?: null;

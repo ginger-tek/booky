@@ -1,5 +1,24 @@
 :root {
-  --pico-red: #AF291D;
+  --pico-red: rgb(175, 41, 29);
+  --pico-red-hover: rgb(197, 47, 33);
+  --pico-red-focus: rgba(197, 47, 33, 0.375);
+}
+
+:where(button, [role=button]) {
+  &.danger {
+    --pico-background-color: var(--pico-red);
+    --pico-border-color: var(--pico-red);
+    --pico-color: #fff;
+
+    &:is(:hover, :active, :focus) {
+      --pico-background-color: var(--pico-red-hover);
+      --pico-border-color: var(--pico-red-hover);
+    }
+
+    &:is(:active, :focus) {
+      --pico-box-shadow: var(--pico-button-hover-box-shadow, 0 0 0 rgba(0, 0, 0, 0)), 0 0 0 var(--pico-outline-width) var(--pico-red-focus);
+    }
+  }
 }
 
 body>header {
@@ -14,7 +33,7 @@ article.alert {
 
   &.danger {
     background: var(--pico-red);
-    color: var(--pico-color-inverse);
+    color: #fff;
   }
 }
 
@@ -30,10 +49,92 @@ article.alert {
   }
 }
 
-nav ul li:has(hr) {
-  padding: 0 !important;
+details.dropdown>summary+ul li:has(>hr) {
+  padding: 0;
 
   >hr {
-    line-height: .25em;
+    margin: .75em 0;
+  }
+}
+
+.bottom-spacing {
+  margin-bottom: var(--pico-spacing);
+}
+
+.flex {
+  display: flex;
+  align-items: center;
+  gap: .5em;
+
+  >*,
+  input:not([type=checkbox], [type=radio]),
+  select,
+  textarea,
+  button,
+  [role=button] {
+    margin-bottom: 0;
+  }
+
+  &.fill>* {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+
+  &.spread {
+    justify-content: space-between;
+  }
+}
+
+table tr td {
+
+  >*,
+  input:not([type=checkbox], [type=radio]),
+  select,
+  textarea,
+  button,
+  [role=button] {
+    margin-bottom: 0;
+  }
+}
+
+.bordered:has(table) {
+  border: 1px solid var(--pico-accordion-border-color);
+  border-radius: var(--pico-border-radius);
+
+  >table {
+    margin-bottom: 0;
+    border-bottom: none;
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+  }
+}
+
+.bottom-clear {
+  margin-bottom: 0;
+
+  &.children>* {
+    margin-bottom: 0;
+  }
+}
+
+label:has([required])::before {
+  content: "*";
+  color: var(--pico-red);
+}
+
+@media (max-width: 600px) {
+  :where(button, [role=button]):has(>i.bi) {
+    font-size: 0;
+
+    i.bi {
+      font-size: 1rem;
+      vertical-align: middle;
+    }
+  }
+
+  .grid:not(:has(>article)) {
+    gap: 0;
   }
 }

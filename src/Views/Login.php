@@ -1,4 +1,4 @@
-<form method="POST" action="/login">
+<form method="POST" action="/login<?= $app->getQuery('next') ? '?next=' . urlencode($app->getQuery('next')) : '' ?>">
   <h2>Login</h2>
   <article class="alert danger"><?= $error ?? '' ?></article>
   <label>Username

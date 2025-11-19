@@ -10,8 +10,8 @@ class Tokens
   private static string $secret = 'potatodemon';
 
   /**
-  * @return array{token: string, exp: int}
-  */
+   * @return array{token: string, exp: int}
+   */
   public static function encode(array $data, ?int $exp): array
   {
     $exp = time() + $exp;
@@ -27,7 +27,7 @@ class Tokens
   {
     try {
       return JWT::decode($token, new Key(self::$secret, 'HS256'));
-    } catch(\Exception $ex) {
+    } catch (\Exception $ex) {
       return null;
     }
   }

@@ -21,25 +21,26 @@ class Auth
       'name' => $user->username
     ], 3600);
     setcookie('token', $token, $exp);
-    $app->redirect('/dashboard');
+    $app->redirect($app->getQuery('next') ?: '/dashboard');
   }
 
   public static function viewLogin(Routy $app)
   {
-    $users = (new Users)->list();
-    $app->render('Login', ['users' => $users]);
+    if ($app->getCtx('session'))
+      return $app->redirect('/dashboard');
+    $app->render('Login');
   }
 
   public static function postSignup(Routy $app)
   {
     $body = $app->getBody();
     $svc = new Users;
-    if ($exists = $svc->find($body->username))
+    if ($svc->find($body->username))
       return $app->render('Signup', [
         'error' => 'Username taken'
       ]);
     $hash = password_hash($body->password, PASSWORD_BCRYPT);
-    if ($user = $svc->create($body->username, $hash))
+    if ($svc->create($body->username, $hash))
       return $app->redirect('/login');
     $app->render('Signup', [
       'error' => 'Failed to signup'
