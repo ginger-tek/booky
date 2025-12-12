@@ -6,6 +6,7 @@ use GingerTek\Routy;
 use App\Data\Database;
 use App\Services\Invoices as InvService;
 use App\Services\Clients;
+use App\Services\Settings;
 
 class Invoices
 {
@@ -25,6 +26,10 @@ class Invoices
   public static function postCreate(Routy $app)
   {
     $data = $app->getBody();
+    if (empty($data->clientId))
+      return $app->render('Error', [
+        'error' => 'Client is required'
+      ]);
     $invoice = (new InvService)->create(
       (string) $data->clientId,
       (string) $data->summary
@@ -67,21 +72,24 @@ class Invoices
     $id = $app->getParam('id');
     $db = new Database;
     $invSvc = new InvService($db);
+    $settingsSvc = new Settings($db);
     $invoice = $invSvc->get($id);
     if (!$invoice)
       return $app->render('NotFound', [
         'error' => 'Invoice not found'
       ]);
-    $clients = (new Clients($db))->list();
+    $client = (new Clients($db))->get($invoice->clientId);
     $items = $invSvc->listItems($id);
     ob_start();
-    extract([
+    $settings = $settingsSvc->list(true);
+    $template = $settings['template'] ?? '<h1>Invoice Template</h1>';
+    $result = \App\Utils::parseTemplate($template, [
       'invoice' => $invoice,
-      'clients' => $clients,
-      'items' => $items
-    ], EXTR_OVERWRITE);
-    include "../src/Views/InvoicePrint.php";
-    exit(ob_get_clean());
+      'client' => $client,
+      'items' => $items,
+      'settings' => $settings
+    ]);
+    exit($result);
   }
 
   public static function postSaveOne(Routy $app)
@@ -95,7 +103,6 @@ class Invoices
         'clientId' => (string) $data->clientId,
         'details' => (string) $data->details,
         'dueDate' => (string) $data->dueDate,
-        'amountDue' => (float) $data->amountDue,
         'amountPaid' => (float) $data->amountPaid,
         'paidDate' => (string) $data->paidDate
       ]

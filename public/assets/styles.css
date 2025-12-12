@@ -2,6 +2,10 @@
   --pico-red: rgb(175, 41, 29);
   --pico-red-hover: rgb(197, 47, 33);
   --pico-red-focus: rgba(197, 47, 33, 0.375);
+
+  --modal-distance: 1em;
+  --modal-shrink: .95;
+  --modal-duration: .2s;
 }
 
 :where(button, [role=button]) {
@@ -111,6 +115,15 @@ table tr td {
   }
 }
 
+.center {
+  text-align: center;
+}
+
+.center-form {
+  max-inline-size: 320px;
+  margin-inline: auto;
+}
+
 .bottom-clear {
   margin-bottom: 0;
 
@@ -124,7 +137,7 @@ label:has([required])::before {
   color: var(--pico-red);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 767px) {
   :where(button, [role=button]):has(>i.bi) {
     font-size: 0;
 
@@ -134,7 +147,81 @@ label:has([required])::before {
     }
   }
 
-  .grid:not(:has(>article)) {
-    gap: 0;
+  .grid {
+    grid-row-gap: 0;
+  }
+}
+
+textarea.code {
+  font-family: monospace;
+  font-size: .9rem;
+}
+
+dialog {
+  animation: pvfadeout var(--modal-duration) ease-out forwards;
+}
+
+dialog[open] {
+  animation: pvfadein var(--modal-duration) ease-in forwards;
+}
+
+.modal-is-open {
+  pointer-events: auto;
+  touch-action: auto;
+}
+
+dialog>article {
+  animation: pvslidedown var(--modal-duration) ease-out forwards;
+}
+
+dialog[open]>article {
+  animation: pvslideup var(--modal-duration) ease-in forwards;
+}
+
+@keyframes pvfadein {
+  0% {
+    opacity: 0;
+    display: none;
+  }
+
+  100% {
+    opacity: 1;
+    display: flex;
+  }
+}
+
+@keyframes pvfadeout {
+  0% {
+    opacity: 1;
+    display: flex;
+  }
+
+  100% {
+    opacity: 0;
+    display: none;
+  }
+}
+
+@keyframes pvslideup {
+  0% {
+    margin-top: var(--modal-distance);
+    transform: scale(var(--modal-shrink));
+  }
+
+  100% {
+    margin-top: 0;
+    transform: scale(1);
+  }
+}
+
+@keyframes pvslidedown {
+  0% {
+    margin-top: 0;
+    transform: scale(1);
+  }
+
+  100% {
+    margin-top: var(--modal-distance);
+    transform: scale(var(--modal-shrink));
   }
 }

@@ -10,7 +10,8 @@
     <form method="POST" action="/invoices">
       <label>Client
         <select name="clientId" required>
-          <option value="" disabled selected>Select a client</option>
+          <option value="" disabled selected><?= empty($clients) ? 'No clients available. Add a client first' : 'Select a client' ?>
+          </option>
           <?php foreach ($clients as $client): ?>
             <option value="<?= $client->id ?>"><?= htmlspecialchars($client->name) ?></option>
           <?php endforeach ?>
@@ -28,27 +29,35 @@
 </dialog>
 <div class="flex spread bottom-spacing">
   <h2>Invoices</h2>
-  <button onclick="this.blur();newInvoice.showModal()"><i class="bi bi-plus"></i></button>
+  <button onclick="this.blur();newInvoice.showModal()"><i class="bi bi-plus"></i> New Invoice</button>
 </div>
 <?php if (empty($items)): ?>
   <div align="center">
     <br>
     <div style="font-size:2em"><i class="bi bi-slash-square"></i></div>
-    <p>No invoices found</p>
+    <p>No invoices yet</p>
   </div>
+<?php else: ?>
+  <input type="search" id="search" placeholder="Search invoices...">
+  <div id="invoices">
+    <?php foreach ($items as $item): ?>
+      <article>
+        <div class="flex spread">
+          <div>
+            <h3><?= $item->summary ?></h3>
+            <div><i class="bi bi-person-fill"></i> <?= $item->clientName ?></div>
+          </div>
+          <div align="right">
+            <h4><?= \App\Utils::currency($item->amountDue) ?></h4>
+            <div><i class="bi bi-alarm"></i> Due <?= \App\Utils::slashDate($item->dueDate) ?: 'TBD' ?></div>
+          </div>
+        </div>
+        <a href="/invoices/<?= $item->id ?>" class="stretch"></a>
+      </article>
+    <?php endforeach ?>
+  </div>
+  <script type="module">
+    import { initFilterChildElements } from '/assets/utils.js'
+    initFilterChildElements(invoices, search, 'No invoices found');
+  </script>
 <?php endif ?>
-<?php foreach ($items as $item): ?>
-  <article>
-    <div class="flex spread">
-      <div>
-        <h3><?= $item->summary ?></h3>
-        <div><i class="bi bi-person-fill"></i> <?= $item->clientName ?></div>
-      </div>
-      <div align="right">
-        <h4><?= \App\Utils::currency($item->amountDue) ?></h4>
-        <div><i class="bi bi-alarm"></i> Due <?= \App\Utils::slashDate($item->dueDate) ?: 'TBD' ?></div>
-      </div>
-    </div>
-    <a href="/invoices/<?= $item->id ?>" class="stretch"></a>
-  </article>
-<?php endforeach ?>

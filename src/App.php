@@ -7,6 +7,7 @@ use App\Controllers\Auth;
 use App\Controllers\Dashboard;
 use App\Controllers\Invoices;
 use App\Controllers\Clients;
+use App\Controllers\Settings;
 
 $app = new \GingerTek\Routy([
   'render' => \App\Utils::renderStrategy(...),
@@ -24,6 +25,8 @@ try {
     $app->get('/dashboard', Dashboard::view(...));
     $app->group('/invoices', Invoices::routes(...));
     $app->group('/clients', Clients::routes(...));
+    $app->get('/expenses', Dashboard::viewExpenses(...));
+    $app->group('/settings', Settings::routes(...));
   });
   $app->fallback(fn() => $app->render('NotFound'));
 } catch (\Exception $ex) {

@@ -18,6 +18,7 @@ class Database
       id text primary key,
       username text not null unique,
       passhash text not null,
+      enabled integer default 0,
       created datetime default current_timestamp,
       updated datetime default current_timestamp
     );
@@ -55,9 +56,18 @@ class Database
       updated datetime default current_timestamp,
       foreign key(invoiceId) references invoices(id) on delete cascade
     );
+    create table if not exists settings(
+      userId text not null,
+      name text not null,
+      value text,
+      created datetime default current_timestamp,
+      updated datetime default current_timestamp,
+      primary key(userId, name) on conflict replace
+    );
     create index if not exists idx_invoices_userId on invoices(userId);
     create index if not exists idx_clients_userId on clients(userId);
     create index if not exists idx_invoice_items_invoiceId on invoice_items(invoiceId);
+    create index if not exists idx_settings_userId on settings(userId);
 
     drop trigger if exists update_invoice_amountDue_insert;
     create trigger update_invoice_amountDue_insert
@@ -90,11 +100,6 @@ class Database
       where id = old.invoiceId;
     end;
     SQL);
-  }
-
-  public function lastInsertId(): mixed
-  {
-    return $this->pdo->lastInsertId();
   }
 
   public function run(string $sql, ?array $vals = []): \PDOStatement

@@ -13,7 +13,7 @@ class Clients extends Service
 
   public function create(string $name): ?object
   {
-    $id = uniqid();
+    $id = \App\Utils::createId();
     $this->db->run("insert into clients(id,name,userId)
     values(?,?,?)", [
       $id,

@@ -13,7 +13,7 @@ class Invoices extends Service
 
   public function create(string $clientId, string $summary): ?object
   {
-    $id = uniqid();
+    $id = \App\Utils::createId();
     $this->db->run("insert into invoices(id,userId,clientId,summary)
     values(?,?,?,?)", [
       $id,
@@ -69,7 +69,6 @@ class Invoices extends Service
       clientId = :clientId,
       details = :details,
       dueDate = :dueDate,
-      amountDue = :amountDue,
       amountPaid = :amountPaid,
       paidDate = :paidDate,
       updated = current_timestamp
@@ -90,7 +89,7 @@ class Invoices extends Service
 
   public function createItem(string $invoiceId, string $summary, string $type, float $amount): ?object
   {
-    $id = uniqid();
+    $id = \App\Utils::createId();
     $this->db->run("insert into invoice_items(id,userId,invoiceId,summary,type,amount)
     values(?,?,?,?,?,?)", [
       $id,

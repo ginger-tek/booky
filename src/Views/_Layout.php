@@ -23,7 +23,7 @@
               <?php if ($isAuthed): ?>
                 <i class="bi bi-person-circle"></i> <?= $user->username ?>
               <?php else: ?>
-                <i class="bi bi-list"></i>
+                <i class="bi bi-list"></i> Menu
               <?php endif ?>
             </summary>
             <ul dir="rtl">
@@ -31,6 +31,8 @@
                 <li dir="ltr"><a href="/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
                 <li dir="ltr"><a href="/invoices"><i class="bi bi-receipt"></i> Invoices</a></li>
                 <li dir="ltr"><a href="/clients"><i class="bi bi-people"></i> Clients</a></li>
+                <li dir="ltr"><a href="/expenses"><i class="bi bi-journal-text"></i> Expenses</a></li>
+                <li dir="ltr"><a href="/settings"><i class="bi bi-gear"></i> Settings</a></li>
                 <li>
                   <hr>
                 </li>

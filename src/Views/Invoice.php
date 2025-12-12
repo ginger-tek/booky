@@ -47,8 +47,9 @@
     <a role="button" class="secondary" href="/invoices">
       <i class="bi bi-arrow-left"></i> Back
     </a>
-    <button type="submit"><i class="bi bi-save"></i> Save</button>
-    <button type="button" onclick="printInvoice()"><i class="bi bi-printer"></i> Print</button>
+    <button type="submit"><i class="bi bi-floppy"></i> Save</button>
+    <button type="button" onclick="printInvoice()"><i class="bi bi-eye"></i> Preview</button>
+    <button type="button" onclick="printInvoice(true)"><i class="bi bi-printer"></i> Print</button>
     <button type="button" class="danger" onclick="this.blur();confirmDelete.showModal()"><i class="bi bi-trash"></i>
       Delete</button>
   </div>
@@ -75,12 +76,6 @@
       <input type="date" name="dueDate"
         value="<?= $invoice->dueDate ? htmlspecialchars((new DateTime($invoice->dueDate))->format('Y-m-d')) : '' ?>">
     </label>
-    <label>Amount Due (Subtotal)
-      <input type="number" name="amountDue" value="<?= htmlspecialchars($invoice->amountDue) ?>" step="0.01" min="0"
-        required>
-    </label>
-  </div>
-  <div class="grid">
     <label>Paid Date
       <input type="date" name="paidDate"
         value="<?= $invoice->paidDate ? htmlspecialchars((new DateTime($invoice->paidDate))->format('Y-m-d')) : '' ?>">
@@ -93,8 +88,8 @@
 </form>
 <div class="flex spread bottom-spacing">
   <div>
-    <h3 class="bottom-clear">Itemizations</h3>
-    <p class="bottom-clear">Subtotal: <b><?= \App\Utils::currency($invoice->amountDue) ?></b></p>
+    <h4 class="bottom-clear">Itemizations</h4>
+    <p class="bottom-clear">Amount Due: <b><?= \App\Utils::currency($invoice->amountDue) ?></b></p>
   </div>
   <button onclick="this.blur();newItem.showModal()"><i class="bi bi-plus"></i> Add Item</button>
 </div>
@@ -112,7 +107,7 @@
         <tr>
           <th>Summary</th>
           <th>Type</th>
-          <th>Price</th>
+          <th>Amount</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -140,9 +135,9 @@
               <form method="POST" id="deleteItem<?= $item->id ?>"
                 action="/invoices/<?= $invoice->id ?>/items/<?= $item->id ?>/delete"></form>
               <div class="flex">
-                <button type="submit" form="saveItem<?= $item->id ?>"><i class="bi bi-save"></i> Save</button>
-                <button type="submit" form="deleteItem<?= $item->id ?>" class="danger"><i
-                    class="bi bi-trash"></i> Delete</button>
+                <button type="submit" form="saveItem<?= $item->id ?>"><i class="bi bi-floppy"></i> Save</button>
+                <button type="submit" form="deleteItem<?= $item->id ?>" class="danger"><i class="bi bi-trash"></i>
+                  Delete</button>
               </div>
             </td>
           </tr>
@@ -152,12 +147,14 @@
   </div>
 <?php endif ?>
 <script>
-  function printInvoice() {
+  function printInvoice(print = false) {
     const printWindow = window.open(`/invoices/<?= $invoice->id ?>/print`, 'Invoice #<?= $invoice->id ?>');
     printWindow.onload = () => {
       setTimeout(() => {
-        // printWindow.print();
-        // printWindow.close();
+        if (print) {
+          printWindow.print();
+          printWindow.close();
+        }
       });
     };
   }

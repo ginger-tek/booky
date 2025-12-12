@@ -2,11 +2,13 @@
 /**
  * @var string $month
  * @var float $revenue
+ * @var float $expenses
  * @var float $income
  * @var int $invoiceCount
  * @var int $newClientCount
  * @var string $year
  * @var float $revenueYTD
+ * @var float $expensesYTD
  * @var float $incomeYTD
  * @var int $invoiceCountYTD
  * @var int $newClientCountYTD
@@ -19,9 +21,19 @@
 </div>
 <div class="grid">
   <article align="center">
-    <label>Revenue / Income</label>
-    <h2><?= \App\Utils::currency($revenue) ?> / <?= \App\Utils::currency($income) ?></h2>
+    <label>Revenue</label>
+    <h2><?= \App\Utils::currency($revenue) ?></h2>
   </article>
+  <article align="center">
+    <label>Expenses</label>
+    <h2><?= \App\Utils::currency($expenses) ?></h2>
+  </article>
+  <article align="center">
+    <label>Income</label>
+    <h2><?= \App\Utils::currency($income) ?></h2>
+  </article>
+</div>
+<div class="grid">
   <article align="center">
     <label># of Invoices</label>
     <h2><?= $invoiceCount ?></h2>
@@ -42,15 +54,25 @@
 </div>
 <div class="grid">
   <article align="center">
-    <label>Total Revenue / Income</label>
-    <h2><?= \App\Utils::currency($revenueYTD) ?> / <?= \App\Utils::currency($incomeYTD) ?></h2>
+    <label>Revenue</label>
+    <h2><?= \App\Utils::currency($revenueYTD) ?></h2>
   </article>
   <article align="center">
-    <label>Total # of Invoices</label>
+    <label>Expenses</label>
+    <h2><?= \App\Utils::currency($expensesYTD) ?></h2>
+  </article>
+  <article align="center">
+    <label>Income</label>
+    <h2><?= \App\Utils::currency($incomeYTD) ?></h2>
+  </article>
+</div>
+<div class="grid">
+  <article align="center">
+    <label># of Invoices</label>
     <h2><?= $invoiceCountYTD ?></h2>
   </article>
   <article align="center">
-    <label>Total # of New Clients</label>
+    <label># of New Clients</label>
     <h2><?= $newClientCountYTD ?></h2>
   </article>
 </div>

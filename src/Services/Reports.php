@@ -25,6 +25,24 @@ class Reports extends Service
     return (float) $result->revenue;
   }
 
+  public function getMonthExpenses(string $month): float
+  {
+    $start = "$month-01";
+    $end = date('Y-m-d', strtotime("$start +1 month"));
+    $result = $this->db->run("
+    select coalesce(sum(ii.amount),0) as totalExpenses
+    from invoice_items ii
+    join invoices i on i.id = ii.invoiceId
+    where i.userId = ?
+    and ii.created between ? and ?
+    and ii.type in ('expense')", [
+      $this->uid,
+      $start,
+      $end
+    ])->fetch();
+    return (float) $result->totalExpenses;
+  }
+
   public function getMonthIncome(string $month): float
   {
     $start = "$month-01";
@@ -35,7 +53,8 @@ class Reports extends Service
     join invoices i on i.id = ii.invoiceId
     where i.userId = ?
     and ii.created between ? and ?
-    and ii.type = 'product'", [
+    and i.paidDate is not null
+    and ii.type in ('expense')", [
       $this->uid,
       $start,
       $end
@@ -85,6 +104,24 @@ class Reports extends Service
     return (float) $result->revenue;
   }
 
+  public function getYearToDateExpenses(string $year): float
+  {
+    $start = "$year-01-01";
+    $end = date('Y-m-d', strtotime("$start +1 year"));
+    $result = $this->db->run("
+    select coalesce(sum(ii.amount),0) as totalExpenses
+    from invoice_items ii
+    join invoices i on i.id = ii.invoiceId
+    where i.userId = ?
+    and ii.created between ? and ?
+    and ii.type in ('expense')", [
+      $this->uid,
+      $start,
+      $end
+    ])->fetch();
+    return (float) $result->totalExpenses;
+  }
+
   public function getYearToDateIncome(string $year): float
   {
     $start = "$year-01-01";
@@ -95,7 +132,8 @@ class Reports extends Service
     join invoices i on i.id = ii.invoiceId
     where i.userId = ?
     and ii.created between ? and ?
-    and ii.type in ('product','parts')", [
+    and i.paidDate is not null
+    and ii.type in ('expense')", [
       $this->uid,
       $start,
       $end
@@ -129,5 +167,40 @@ class Reports extends Service
       $end
     ])->fetch();
     return (int) $result->clientCount;
+  }
+
+  public function getExpenseLedgerItems(string $month): array
+  {
+    $start = "$month-01";
+    $end = date('Y-m-d', strtotime("$start +1 month"));
+    return $this->db->run("select *
+    from invoice_items ii
+    join invoices i on i.id = ii.invoiceId
+    where i.userId = ?
+    and ii.created between ? and ?
+    and ii.type in ('expense')
+    order by ii.created desc", [
+      $this->uid,
+      $start,
+      $end
+    ])->fetchAll();
+  }
+
+  public function getTotalExpenses(string $month): float
+  {
+    $start = "$month-01";
+    $end = date('Y-m-d', strtotime("$start +1 month"));
+    $result = $this->db->run("
+    select coalesce(sum(ii.amount),0) as totalExpenses
+    from invoice_items ii
+    join invoices i on i.id = ii.invoiceId
+    where i.userId = ?
+    and ii.created between ? and ?
+    and ii.type in ('expense')", [
+      $this->uid,
+      $start,
+      $end
+    ])->fetch();
+    return (float) $result->totalExpenses;
   }
 }
