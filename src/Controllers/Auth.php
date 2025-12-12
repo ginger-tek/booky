@@ -39,9 +39,13 @@ class Auth
     $body = $app->getBody();
     $db = new Database;
     $userSvc = new Users($db);
-    if ($userSvc->find($body->username))
+    if ($userSvc->find($body->username, null))
       return $app->render('Signup', [
         'error' => 'Username taken'
+      ]);
+    if ($body->password !== $body->confirmPass)
+      return $app->render('Signup', [
+        'error' => 'Passwords do not match'
       ]);
     $hash = password_hash($body->password, PASSWORD_BCRYPT);
     if ($user = $userSvc->create($body->username, $hash)) {

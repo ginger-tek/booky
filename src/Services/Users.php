@@ -23,11 +23,11 @@ class Users extends Service
     where id = ? and enabled = " . ($isEnabled ? "1" : "0"), [$id])->fetch() ?: null;
   }
 
-  public function find(string $username, bool $isEnabled = false): ?object
+  public function find(string $username, ?bool $isEnabled = false): ?object
   {
     return $this->db->run("select *
     from users
-    where username = ? " . ($isEnabled ? "and enabled = 1" : "and enabled = 0"), [$username])->fetch() ?: null;
+    where username = ? " . ($isEnabled === true ? "and enabled = 1" : ($isEnabled === false ? "and enabled = 0" : "")), [$username])->fetch() ?: null;
   }
 
   public function list(): array
