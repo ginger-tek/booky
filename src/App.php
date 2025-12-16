@@ -9,6 +9,8 @@ use App\Controllers\Invoices;
 use App\Controllers\Clients;
 use App\Controllers\Settings;
 
+\App\Services\Config::load();
+
 $app = new \GingerTek\Routy([
   'render' => \App\Utils::renderStrategy(...),
 ]);
