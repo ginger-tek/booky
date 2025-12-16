@@ -3,7 +3,7 @@
     <h2 class="center">Signup</h2>
     <article class="alert danger"><?= $error ?? '' ?></article>
     <label>Username
-      <input name="username" type="text" autocapitalize="off" required>
+      <input name="username" type="text" autocapitalize="off" value="<?= $cache_username ?? '' ?>" required>
     </label>
     <article class="alert info">Password requirements:
       <ul style="color:inherit" class="bottom-clear">
