@@ -1,7 +1,11 @@
 :root {
+  --pico-font-size: 100%;
+
   --pico-red: rgb(175, 41, 29);
   --pico-red-hover: rgb(197, 47, 33);
   --pico-red-focus: rgba(197, 47, 33, 0.375);
+
+  --pico-azure: rgb(1, 127, 192);
 
   --modal-distance: 1em;
   --modal-shrink: .95;
@@ -35,9 +39,35 @@ article.alert {
     display: none;
   }
 
+  &::before {
+    display: inline-block;
+    font-family: bootstrap-icons;
+    font-style: normal;
+    font-weight: 400 !important;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    vertical-align: -.125em;
+    margin-right: .5em;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  &.info {
+    background: var(--pico-azure);
+    color: #fff;
+
+    &::before {
+      content: '\F431';
+    }
+  }
+
   &.danger {
     background: var(--pico-red);
     color: #fff;
+
+    &::before {
+      content: '\F33A';
+    }
   }
 }
 
@@ -63,6 +93,14 @@ details.dropdown>summary+ul li:has(>hr) {
 
 .bottom-spacing {
   margin-bottom: var(--pico-spacing);
+}
+
+.bottom-clear {
+  margin-bottom: 0;
+
+  &.children>* {
+    margin-bottom: 0;
+  }
 }
 
 .flex {
@@ -122,14 +160,6 @@ table tr td {
 .center-form {
   max-inline-size: 320px;
   margin-inline: auto;
-}
-
-.bottom-clear {
-  margin-bottom: 0;
-
-  &.children>* {
-    margin-bottom: 0;
-  }
 }
 
 label:has([required])::before {
