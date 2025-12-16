@@ -1,4 +1,14 @@
 {
+    "name": "ginger-tek/booky",
+    "description": "Simple, self-hosted book-keeping app",
+    "type": "project",
+    "authors": [
+        {
+            "name": "GingerTek",
+            "homepage": "https://github.com/ginger-tek"
+        }
+    ],
+    "license": "ISC",
     "require": {
         "ginger-tek/routy": "^4.3",
         "firebase/php-jwt": "^6.11"
@@ -7,5 +17,8 @@
         "psr-4": {
             "App\\": "src/"
         }
+    },
+    "scripts": {
+        "init": "php init.php"
     }
 }
