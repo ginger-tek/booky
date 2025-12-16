@@ -19,6 +19,6 @@
         }
     },
     "scripts": {
-        "init": "php init.php"
+        "init": "php src/Init.php"
     }
 }
