@@ -45,6 +45,7 @@ class Auth
       ]);
     if ($body->password !== $body->confirmPass)
       return $app->render('Signup', [
+        'cache_username' => $body->username,
         'error' => 'Passwords do not match'
       ]);
     $hash = password_hash($body->password, PASSWORD_BCRYPT);
