@@ -32,5 +32,5 @@ try {
   });
   $app->fallback(fn() => $app->render('NotFound'));
 } catch (\Exception $ex) {
-  $app->render('Error', ['error' => $ex->getMessage()]);
+  $app->render('Error', ['error' => $ex->__tostring()]);
 }
