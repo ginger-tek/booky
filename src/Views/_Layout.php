@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <title><?= $title ?? 'Home' ?> - Booky</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="//unpkg.com/@picocss/pico/css/pico.min.css">
+  <link rel="stylesheet" href="//unpkg.com/@picocss/pico/css/pico.indigo.min.css">
   <link rel="stylesheet" href="//unpkg.com/bootstrap-icons/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="/assets/styles.css">
 </head>
