@@ -15,6 +15,7 @@
       <tr>
         <th>Date</th>
         <th>Summary</th>
+        <th>Invoice</th>
         <th>Amount</th>
       </tr>
     </thead>
@@ -30,6 +31,13 @@
           <tr>
             <td><?= \App\Utils::slashDate($expense->created) ?></td>
             <td><?= htmlspecialchars($expense->summary) ?></td>
+            <td>
+              <?php if (!empty($expense->invoiceId)): ?>
+                <a href="/invoices/<?= $expense->invoiceId ?>"><?= htmlspecialchars($expense->invoiceSummary) ?></a>
+              <?php else: ?>
+                N/A
+              <?php endif ?>
+            </td>
             <td><?= \App\Utils::currency($expense->amount) ?></td>
           </tr>
         <?php endforeach ?>

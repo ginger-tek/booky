@@ -39,6 +39,7 @@ try {
       $email = $argv[4] ?? null;
       $passhash = password_hash($argv[5], PASSWORD_DEFAULT);
       $user = (new \App\Services\Users)->create($username, $email, $passhash);
+      (new \App\Services\Settings)->init($user->id);
       echo "User created with ID $user->id\n";
     } elseif ($subAction === 'enable' && isset($argv[3])) {
       $userId = $argv[3] ?? null;
@@ -52,6 +53,12 @@ try {
         echo "User $userId disabled\n";
       else
         echo "User $userId not found\n";
+    } elseif ($subAction === 'delete' && isset($argv[3])) {
+      $userId = $argv[3] ?? null;
+      if ((new \App\Services\Users)->delete($userId))
+        echo "User $userId deleted\n";
+      else
+        echo "User $userId not found\n";
     } else {
       echo "Unknown users action\n";
     }
@@ -62,7 +69,8 @@ try {
       'users list [enabled|disabled]',
       'users add <username> <email> <password>',
       'users enable <id>',
-      'users disable <id>'
+      'users disable <id>',
+      'users delete <id>'
     ]) . "\n";
   }
 } catch (Exception $e) {

@@ -29,6 +29,7 @@ export function ctrlSave(form) {
       form.submit()
     }
   })
+  setTimeout(() => form.querySelector('input, textarea, select').focus())
 }
 
 export function initFilterChildElements(container, searchInput, emptyText) {
@@ -50,4 +51,16 @@ export function initFilterChildElements(container, searchInput, emptyText) {
     });
     noResults.style.display = [...container.children].every(c => c.style.display === 'none') ? show : 'none';
   }
+}
+
+export function printInvoice(invoiceId, print = false) {
+  const printWindow = window.open(`/invoices/${invoiceId}/print`, `Invoice #${invoiceId}`);
+  printWindow.onload = () => {
+    setTimeout(() => {
+      if (print) {
+        printWindow.print();
+        printWindow.close();
+      }
+    });
+  };
 }

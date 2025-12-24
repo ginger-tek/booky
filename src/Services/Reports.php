@@ -173,7 +173,7 @@ class Reports extends Service
   {
     $start = "$month-01";
     $end = date('Y-m-d', strtotime("$start +1 month"));
-    return $this->db->run("select *
+    return $this->db->run("select ii.id, ii.summary, ii.amount, ii.created, i.id as invoiceId, i.summary as invoiceSummary
     from invoice_items ii
     join invoices i on i.id = ii.invoiceId
     where i.userId = ?

@@ -73,9 +73,9 @@ class Auth
     $app->render('Signup');
   }
 
-  public static function viewAccountSetup(Routy $app)
+  public static function viewSignupSuccess(Routy $app)
   {
-    $app->render('AccountSetup');
+    $app->render('SignupSuccess');
   }
 
   public static function getLogout(Routy $app)

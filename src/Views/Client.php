@@ -10,7 +10,7 @@
     </form>
   </article>
 </dialog>
-<form method="POST" action="/clients/<?= $client->id ?>">
+<form id="clientForm" method="POST" action="/clients/<?= $client->id ?>">
   <div class="flex fill bottom-spacing">
     <a role="button" class="secondary" href="/clients">
       <i class="bi bi-arrow-left"></i> Back
@@ -33,3 +33,7 @@
     <textarea name="address" rows="4"><?= htmlspecialchars($client->address) ?></textarea>
   </label>
 </form>
+<script type="module">
+  import { ctrlSave } from '/assets/utils.js'
+  ctrlSave(document.getElementById('clientForm'))
+</script>

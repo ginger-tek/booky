@@ -80,4 +80,12 @@ class Users extends Service
       $userId
     ])->rowCount() == 1;
   }
+
+  public function delete(string $userId): bool
+  {
+    return $this->db->run("delete from users
+    where id = ?", [
+      $userId
+    ])->rowCount() == 1;
+  }
 }

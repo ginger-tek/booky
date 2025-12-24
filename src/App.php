@@ -21,7 +21,7 @@ try {
   $app->post('/login', Auth::postLogin(...));
   $app->get('/signup', Auth::viewSignup(...));
   $app->post('/signup', Auth::postSignup(...));
-  $app->get('/account-setup', Auth::viewAccountSetup(...));
+  $app->get('/signup-success', Auth::viewSignupSuccess(...));
   $app->get('/logout', Session::id(...), Auth::getLogout(...));
   $app->group('/', Session::id(...), function () use ($app) {
     $app->get('/', fn() => $app->redirect('/dashboard'));

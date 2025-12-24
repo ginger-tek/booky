@@ -56,32 +56,32 @@ class Utils
       $arg = $matches['arg'] ?? null;
       $val = match ($key) {
         'invoice.id' => $invoice->id,
-        'invoice.summary' => $invoice->summary ?? '',
-        'invoice.details' => $invoice->details ?? '',
+        'invoice.summary' => $invoice->summary,
+        'invoice.details' => $invoice->details,
         'invoice.created' => $invoice->created,
         'invoice.dueDate' => $invoice->dueDate,
         'invoice.paidDate' => $invoice->paidDate,
         'invoice.amountDue' => $invoice->amountDue,
         'invoice.amountPaid' => $invoice->amountPaid,
-        'invoice.subtotal' => $invoice->subtotal ?? '',
-        'client.name' => $client->name ?? '',
-        'client.email' => $client->email ?? '',
-        'client.phone' => $client->phone ?? '',
-        'client.address' => $client->address ?? '',
-        'itemization' => (function ($items) use ($invoice) {
-          $rows = '';
-          foreach ($items as $item)
-            $rows .= "<tr><td>" . htmlspecialchars($item->summary) . "</td>
+        'invoice.subtotal' => $invoice->subtotal,
+        'itemizationsTable' => (function ($items) use ($invoice) {
+            $rows = '';
+            foreach ($items as $item)
+              $rows .= "<tr><td>" . htmlspecialchars($item->summary) . "</td>
                 <td style=\"text-align:right\">" . \App\Utils::currency($item->amount) . "</td></tr>";
-          return "<table><tbody>
-              <tr><th colspan=\"2\">Itemization</th></tr>
+            return "<table><tbody>
+              <tr><th colspan=\"2\" style=\"text-align:left\">Itemizations</th></tr>
               {$rows}
               <tr>
                 <th style=\"text-align:right\">Amount Total</th>
                 <td style=\"text-align:right;font-weight:bold\">" . \App\Utils::currency($invoice->amountDue) . "</td>
               </tr>
             </tbody></table>";
-        })($items),
+          })($items),
+        'client.name' => $client->name ?? '',
+        'client.email' => $client->email ?? '',
+        'client.phone' => $client->phone ?? '',
+        'client.address' => $client->address ?? '',
         'company' => $settings['company'] ?? '',
         'website' => $settings['website'] ?? '',
         'email' => $settings['email'] ?? '',
@@ -94,7 +94,9 @@ class Utils
         'lcase' => strtolower($val),
         'date' => date($arg ?? 'F j, Y', strtotime($val)),
         'currency' => \App\Utils::currency((float) $val),
-        'raw' => htmlspecialchars($val),
+        'link' => "<a href=\"https://{$val}{$arg}\">{$val}{$arg}</a>",
+        'mailto' => "<a href=\"mailto:{$val}\">{$val}</a>",
+        'tel' => "<a href=\"tel:{$val}\">{$val}</a>",
         null => $val,
         default => $val
       };

@@ -34,6 +34,10 @@ body>header {
   padding-bottom: 0;
 }
 
+article :where(ul, ol, p, blockquote, pre, table, dl, hr) {
+  color: inherit;
+}
+
 article.alert {
   &:empty {
     display: none;
@@ -185,6 +189,10 @@ label:has([required])::before {
 textarea.code {
   font-family: monospace;
   font-size: .9rem;
+}
+
+iframe {
+  border-radius: var(--pico-border-radius);
 }
 
 dialog {

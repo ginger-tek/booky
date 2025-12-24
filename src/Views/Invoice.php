@@ -42,14 +42,14 @@
     </form>
   </article>
 </dialog>
-<form method="POST" action="/invoices/<?= $invoice->id ?>">
+<form id="invoiceForm" method="POST" action="/invoices/<?= $invoice->id ?>">
   <div class="flex fill bottom-spacing">
     <a role="button" class="secondary" href="/invoices">
       <i class="bi bi-arrow-left"></i> Back
     </a>
     <button type="submit"><i class="bi bi-floppy"></i> Save</button>
-    <button type="button" onclick="printInvoice()"><i class="bi bi-eye"></i> Preview</button>
-    <button type="button" onclick="printInvoice(true)"><i class="bi bi-printer"></i> Print</button>
+    <button type="button" id="previewBtn"><i class="bi bi-eye"></i> Preview</button>
+    <button type="button" id="printBtn"><i class="bi bi-printer"></i> Print</button>
     <button type="button" class="danger" onclick="this.blur();confirmDelete.showModal()"><i class="bi bi-trash"></i>
       Delete</button>
   </div>
@@ -146,16 +146,9 @@
     </table>
   </div>
 <?php endif ?>
-<script>
-  function printInvoice(print = false) {
-    const printWindow = window.open(`/invoices/<?= $invoice->id ?>/print`, 'Invoice #<?= $invoice->id ?>');
-    printWindow.onload = () => {
-      setTimeout(() => {
-        if (print) {
-          printWindow.print();
-          printWindow.close();
-        }
-      });
-    };
-  }
+<script type="module">
+  import { ctrlSave, printInvoice } from '/assets/utils.js'
+  ctrlSave(document.getElementById('invoiceForm'))
+  previewBtn.onclick = () => printInvoice('<?= $invoice->id ?>')
+  printBtn.onclick = () => printInvoice('<?= $invoice->id ?>', true)
 </script>

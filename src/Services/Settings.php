@@ -11,15 +11,16 @@ class Settings extends Service
     parent::__construct($db);
   }
 
-  public function init(): void
+  public function init(?string $userId = null): void
   {
+    $this->uid ??= $userId;
     $this->setBulk([
       'company' => 'My Company',
       'email' => 'info@mycompany.com',
       'website' => 'https://mycompany.com',
       'phone' => '123-456-7890',
       'address' => '123 Main St, Anytown, USA',
-      'template' => '<h1>Invoice Template</h1><div>Invoice Summary: {{ invoice.summary }}</div>'
+      'template' => '<h1>Invoice Template</h1><div>Invoice Summary: {{ invoice.summary }}</div>{{ itemizationsTable }}'
     ]);
   }
 
