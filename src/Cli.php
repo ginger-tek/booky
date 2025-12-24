@@ -1,16 +1,17 @@
 <?php
 
 define('ROOT', __DIR__ . '/../');
-require_once 'vendor/autoload.php';
+require_once ROOT . 'vendor/autoload.php';
 try {
   \App\Services\Config::load();
   $action = $argv[1] ?? null;
   if ($action === 'init-db') {
     $driver = getenv('DB_DRIVER') ?: 'sqlite';
-    $schema = "src/Data/schema_$driver.sql";
+    $schema = ROOT . "src/Data/schema_$driver.sql";
     if (!file_exists($schema))
       throw new Exception("No $driver schema file found");
     (new \App\Data\Database)->exec(file_get_contents($schema));
+    echo "Database initialized using $driver schema\n";
   } elseif ($action === 'users') {
     $subAction = $argv[2] ?? null;
     if ($subAction === 'list') {
@@ -19,14 +20,13 @@ try {
       $users = (new \App\Services\Users)->list(['enabled' => $enabled]);
       if (count($users) > 0) {
         $out = [
-          'ID            | Username       | Email                | Enabled | Created          | Updated         ',
-          '-----------------------------------------------------------------------------------------------------'
+          'ID            | Username       | Enabled | Created          | Updated         ',
+          '------------------------------------------------------------------------------'
         ];
         foreach ($users as $user)
           $out[] = join(' | ', [
             $user->id,
             str_pad(substr($user->username, 0, 14), 14, ' ', STR_PAD_RIGHT),
-            str_pad(substr($user->email, 0, 20), 20, ' ', STR_PAD_RIGHT),
             str_pad(substr($user->enabled == 1 ? 'Yes' : 'No', 0, 7), 7, ' ', STR_PAD_RIGHT),
             str_pad(substr($user->created, 0, 16), 16, ' ', STR_PAD_RIGHT),
             str_pad(substr($user->updated, 0, 16), 16, ' ', STR_PAD_RIGHT)
@@ -56,7 +56,14 @@ try {
       echo "Unknown users action\n";
     }
   } else {
-    echo "actions: init-db, users [list [enabled|disabled], enable <id>, disable <id>]\n";
+    echo "CLI actions:\n\t";
+    echo join("\n\t", [
+      'init-db',
+      'users list [enabled|disabled]',
+      'users add <username> <email> <password>',
+      'users enable <id>',
+      'users disable <id>'
+    ]) . "\n";
   }
 } catch (Exception $e) {
   echo "Error: " . $e->getMessage() . "\n";
