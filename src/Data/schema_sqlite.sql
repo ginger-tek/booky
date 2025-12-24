@@ -3,6 +3,7 @@ create table if not exists users(
   id text primary key,
   username text not null unique,
   passhash text not null,
+  email text not null unique,
   enabled integer default 0,
   created datetime default current_timestamp,
   updated datetime default current_timestamp

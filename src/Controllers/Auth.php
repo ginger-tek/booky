@@ -14,7 +14,11 @@ class Auth
   public static function postLogin(Routy $app)
   {
     $body = $app->getBody();
-    $user = (new Users)->find($body->username, true);
+    if (!isset($body->username, $body->password))
+      return $app->render('Login', [
+        'error' => 'Missing required fields'
+      ]);
+    $user = (new Users)->find($body->username);
     if (!$user || !password_verify($body->password, $user->passhash))
       return $app->render('Login', [
         'error' => 'Invalid credentials'
@@ -38,6 +42,10 @@ class Auth
   {
     $body = $app->getBody();
     $db = new Database;
+    if (!isset($body->username, $body->email, $body->password, $body->confirmPass))
+      return $app->render('Signup', [
+        'error' => 'Missing required fields'
+      ]);
     $userSvc = new Users($db);
     if ($userSvc->find($body->username, null))
       return $app->render('Signup', [
@@ -46,13 +54,14 @@ class Auth
     if ($body->password !== $body->confirmPass)
       return $app->render('Signup', [
         'cache_username' => $body->username,
+        'cache_email' => $body->email,
         'error' => 'Passwords do not match'
       ]);
     $hash = password_hash($body->password, PASSWORD_BCRYPT);
-    if ($user = $userSvc->create($body->username, $hash)) {
+    if ($user = $userSvc->create($body->username, $body->email, $hash)) {
       Utils::reqSet('uid', $user->id);
       (new Settings($db))->init();
-      return $app->redirect('/login');
+      return $app->redirect('/account-setup');
     }
     $app->render('Signup', [
       'error' => 'Failed to signup'
@@ -62,6 +71,11 @@ class Auth
   public static function viewSignup(Routy $app)
   {
     $app->render('Signup');
+  }
+
+  public static function viewAccountSetup(Routy $app)
+  {
+    $app->render('AccountSetup');
   }
 
   public static function getLogout(Routy $app)

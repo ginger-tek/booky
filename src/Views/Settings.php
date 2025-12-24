@@ -5,7 +5,12 @@
   </div>
   <article>
     <?php foreach ($settings as $setting):
-      if (in_array($setting->name, ['template', 'address'])): ?>
+      if (in_array($setting->name, ['template', 'address'])):
+        if ($setting->name == 'template'): ?>
+          <article class="alert info">
+            Changes made here will only affect all future invoice template generations. Existing invoices will remain unchanged.
+          </article>
+        <?php endif; ?>
         <label><?= ucfirst($setting->name) ?>
           <textarea <?= $setting->name == 'template' ? 'class="code"' : '' ?> name="<?= $setting->name ?>"
             <?= $setting->name == 'template' ? 'rows="10" required' : '' ?>><?= htmlspecialchars($setting->value) ?></textarea>

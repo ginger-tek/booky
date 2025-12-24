@@ -1,9 +1,25 @@
 {
-  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "image": "php:8.2-fpm",
   "features": {
     "ghcr.io/devcontainers/features/php:1": {
-      "version": "8.3"
-    },
-    "ghcr.io/yassinedoghri/devcontainers/php-extensions-installer:1": {}
-  }
+      "version": "8.2",
+      "installExtensions": [
+        "pdo_sqlite",
+        "sqlite3",
+        "mbstring",
+        "intl",
+        "gd",
+        "xml",
+        "curl",
+        "zip",
+        "bcmath",
+        "pcntl",
+        "exif",
+        "ctype",
+        "iconv",
+        "simplexml"
+      ]
+    }
+  },
+  "postCreateCommand": "apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev libicu-dev zlib1g-dev libzip-dev libxml2-dev libonig-dev sqlite3 libsqlite3-dev $PHPIZE_DEPS && docker-php-ext-install pdo_sqlite sqlite3 mbstring intl gd xml curl zip bcmath pcntl exif ctype iconv simplexml || true && echo 'extension=intl.so' > /usr/local/php/8.2.30/ini/conf.d/intl.ini"
 }

@@ -5,6 +5,9 @@
     <label>Username
       <input name="username" type="text" autocapitalize="off" value="<?= $cache_username ?? '' ?>" required>
     </label>
+    <label>Email
+      <input name="email" type="text" autocapitalize="off" value="<?= $cache_email ?? '' ?>" required>
+    </label>
     <article class="alert info">Password requirements:
       <ul style="color:inherit" class="bottom-clear">
         <li>12 or more characters long

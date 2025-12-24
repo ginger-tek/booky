@@ -20,7 +20,7 @@
     },
     "scripts": {
         "post-install-cmd": [
-            "php src/Init.php"
+            "php src/Cli.php init-db"
         ]
     }
 }

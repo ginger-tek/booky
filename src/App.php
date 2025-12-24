@@ -21,6 +21,7 @@ try {
   $app->post('/login', Auth::postLogin(...));
   $app->get('/signup', Auth::viewSignup(...));
   $app->post('/signup', Auth::postSignup(...));
+  $app->get('/account-setup', Auth::viewAccountSetup(...));
   $app->get('/logout', Session::id(...), Auth::getLogout(...));
   $app->group('/', Session::id(...), function () use ($app) {
     $app->get('/', fn() => $app->redirect('/dashboard'));
@@ -30,7 +31,7 @@ try {
     $app->get('/expenses', Dashboard::viewExpenses(...));
     $app->group('/settings', Settings::routes(...));
   });
-  $app->fallback(fn() => $app->render('NotFound'));
+  $app->fallback(fn() => $app->render('NotFound', ['title' => 'Page Not Found']));
 } catch (\Exception $ex) {
-  $app->render('Error', ['error' => $ex->__tostring()]);
+  $app->render('Error', ['error' => $ex->__toString(), 'title' => 'Uh Oh! An Error Occurred']);
 }

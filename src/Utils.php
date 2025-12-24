@@ -26,6 +26,7 @@ class Utils
   {
     ob_start();
     $user = $app->getCtx('user');
+    $ctx['title'] ??= join(' ', preg_split('/(?=[A-Z])/', $view));
     extract([
       ...$ctx,
       'isAuthed' => !!$user,
@@ -68,11 +69,11 @@ class Utils
         'client.phone' => $client->phone ?? '',
         'client.address' => $client->address ?? '',
         'itemization' => (function ($items) use ($invoice) {
-            $rows = '';
-            foreach ($items as $item)
-              $rows .= "<tr><td>" . htmlspecialchars($item->summary) . "</td>
+          $rows = '';
+          foreach ($items as $item)
+            $rows .= "<tr><td>" . htmlspecialchars($item->summary) . "</td>
                 <td style=\"text-align:right\">" . \App\Utils::currency($item->amount) . "</td></tr>";
-            return "<table><tbody>
+          return "<table><tbody>
               <tr><th colspan=\"2\">Itemization</th></tr>
               {$rows}
               <tr>
@@ -80,7 +81,7 @@ class Utils
                 <td style=\"text-align:right;font-weight:bold\">" . \App\Utils::currency($invoice->amountDue) . "</td>
               </tr>
             </tbody></table>";
-          })($items),
+        })($items),
         'company' => $settings['company'] ?? '',
         'website' => $settings['website'] ?? '',
         'email' => $settings['email'] ?? '',
