@@ -30,7 +30,7 @@
 </dialog>
 <div class="flex spread bottom-spacing">
   <h2>Invoices</h2>
-  <button onclick="this.blur();newInvoice.showModal()"><i class="bi bi-plus"></i> New Invoice</button>
+  <button onclick="this.blur();newInvoice.showModal()"><i class="bi bi-file-earmark-plus-fill"></i> New Invoice</button>
 </div>
 <?php if (empty($items)): ?>
   <div align="center">
@@ -46,11 +46,11 @@
         <header>
           <h3 class="bottom-clear"><?= $item->summary ?></h3>
         </header>
-        <h4 class="bottom-clear flex fill">
+        <div class="grid fill">
           <div class="center"><?= \App\Utils::currency($item->amountDue) ?></div>
           <div class="center"><i class="bi bi-person-square"></i> <?= $item->clientName ?></div>
           <div class="center"><i class="bi bi-calendar3"></i> <?= \App\Utils::slashDate($item->dueDate) ?: 'TBD' ?></div>
-        </h4>
+        </div>
         <a href="/invoices/<?= $item->id ?>" class="stretch"></a>
       </article>
     <?php endforeach ?>

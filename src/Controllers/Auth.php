@@ -26,9 +26,8 @@ class Auth
     [$token, $exp] = Tokens::encode([
       'uid' => $user->id,
       'name' => $user->username
-    ], 3600);
+    ], getenv('TOKEN_EXPIRATION') ?: null);
     setcookie('token', $token, $exp);
-    setcookie('exp', $exp, $exp);
     $app->redirect($app->getQuery('next') ?: '/dashboard');
   }
 
@@ -77,9 +76,8 @@ class Auth
     [$token, $exp] = Tokens::encode([
       'uid' => $session->uid,
       'name' => $session->name
-    ], 3600);
+    ], getenv('TOKEN_EXPIRATION') ?: null);
     setcookie('token', $token, $exp);
-    setcookie('exp', $exp, $exp);
     return $app->sendJson(['message' => 'Session extended', 'exp' => $exp]);
   }
 

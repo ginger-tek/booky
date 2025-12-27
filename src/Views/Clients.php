@@ -19,7 +19,7 @@
 </dialog>
 <div class="flex spread bottom-spacing">
   <h2>Clients</h2>
-  <button onclick="this.blur();newClient.showModal()"><i class="bi bi-plus"></i> New Client</button>
+  <button onclick="this.blur();newClient.showModal()"><i class="bi bi-person-plus-fill"></i> Add Client</button>
 </div>
 <?php if (empty($items)): ?>
   <div align="center">

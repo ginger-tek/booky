@@ -11,14 +11,18 @@ export function submitBusy() {
 export function togglePasswordVisibility() {
   document.querySelectorAll('.toggle-password').forEach(toggle => {
     const input = toggle.nextElementSibling
-    toggle.addEventListener('mousedown', () => {
+    const show = () => {
       input.type = 'text'
       toggle.innerHTML = '<i class="bi bi-eye"></i>'
-    })
-    toggle.addEventListener('mouseup', () => {
+    }
+    const hide = () => {
       input.type = 'password'
       toggle.innerHTML = '<i class="bi bi-eye-slash"></i>'
-    })
+    }
+    toggle.addEventListener('mousedown', show)
+    toggle.addEventListener('mouseup', hide)
+    toggle.addEventListener('touchstart', show)
+    toggle.addEventListener('touchend', hide)
   })
 }
 
@@ -85,10 +89,10 @@ export async function confirmAsync(message) {
 export async function startSessionTimer() {
   let warningTimer;
   let logoutTimer;
-  const exp = await cookieStore.get('exp');
-  if (!exp) return;
-  const expTime = parseInt(exp.value) * 1000;
-  const warningTime = expTime - 60000; // 1 minute before expiration
+  const token = await cookieStore.get('token');
+  if (!token) return;
+  const expTime = parseInt(token.expires) * 1000;
+  const warningTime = expTime - 30000; // 30 seconds before expiration
   console.log('Session expiration time:', new Date(expTime).toLocaleString());
   console.log('Session warning time:', new Date(warningTime).toLocaleString());
   const currentTime = Date.now();

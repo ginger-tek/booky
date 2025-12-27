@@ -171,7 +171,7 @@ label:has([required])::before {
   color: var(--pico-red);
 }
 
-@media (max-width: 767px) {
+/* @media (max-width: 767px) {
   .flex>:where(button, [role=button]):has(>i.bi) {
     font-size: 0;
 
@@ -180,7 +180,7 @@ label:has([required])::before {
       vertical-align: middle;
     }
   }
-}
+} */
 
 @media (max-width: 767px) {
   .grid {
