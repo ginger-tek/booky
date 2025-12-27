@@ -12,7 +12,7 @@ class Tokens
   /**
    * @return array{token: string, exp: int}
    */
-  public static function encode(array $data, ?int $exp): array
+  public static function encode(array $data, ?int $exp = 3600): array
   {
     $exp = time() + $exp;
     $token = JWT::encode([

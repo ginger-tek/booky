@@ -51,8 +51,11 @@
     <?php include $view ?>
   </main>
   <script type="module">
-    import { submitBusy } from '/assets/utils.js'
+    import { submitBusy, startSessionTimer } from '/assets/utils.js'
     submitBusy()
+    <?php if ($isAuthed): ?>
+      startSessionTimer()
+    <?php endif ?>
   </script>
 </body>
 

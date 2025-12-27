@@ -50,26 +50,28 @@ class Utils
   public static function parseTemplate(string $template, array $ctx): string
   {
     ['invoice' => $invoice, 'client' => $client, 'items' => $items, 'settings' => $settings] = $ctx;
-    return preg_replace_callback('/{{\s*(?<key>[\w.]+)\s*(?:\|\s*(?<mod>\w+)\s*(?::\s*(?<arg>.*?))?)?\s*}}/sm', function ($matches) use ($invoice, $client, $items, $settings) {
-      $key = $matches['key'];
-      $mod = $matches['mod'] ?? null;
-      $arg = $matches['arg'] ?? null;
-      $val = match ($key) {
-        'invoice.id' => $invoice->id,
-        'invoice.summary' => $invoice->summary,
-        'invoice.details' => $invoice->details,
-        'invoice.created' => $invoice->created,
-        'invoice.dueDate' => $invoice->dueDate,
-        'invoice.paidDate' => $invoice->paidDate,
-        'invoice.amountDue' => $invoice->amountDue,
-        'invoice.amountPaid' => $invoice->amountPaid,
-        'invoice.subtotal' => $invoice->subtotal,
-        'itemizationsTable' => (function ($items) use ($invoice) {
-            $rows = '';
-            foreach ($items as $item)
-              $rows .= "<tr><td>" . htmlspecialchars($item->summary) . "</td>
+    return preg_replace_callback(
+      '/{{\s*(?<key>[\w\.\/:&?]+)\s*(?:\|\s*(?<mod>\w+)\s*(?::\s*(?<arg>.*?))?)?\s*}}/sm',
+      function ($matches) use ($invoice, $client, $items, $settings) {
+        $key = $matches['key'];
+        $mod = $matches['mod'] ?? null;
+        $arg = $matches['arg'] ?? null;
+        $val = match ($key) {
+          'invoice.id' => $invoice->id,
+          'invoice.summary' => $invoice->summary,
+          'invoice.details' => $invoice->details,
+          'invoice.created' => $invoice->created,
+          'invoice.dueDate' => $invoice->dueDate,
+          'invoice.paidDate' => $invoice->paidDate,
+          'invoice.amountDue' => $invoice->amountDue,
+          'invoice.amountPaid' => $invoice->amountPaid,
+          'invoice.subtotal' => $invoice->subtotal,
+          'itemizationsTable' => (function ($items) use ($invoice) {
+              $rows = '';
+              foreach ($items as $item)
+                $rows .= "<tr><td>" . htmlspecialchars($item->summary) . "</td>
                 <td style=\"text-align:right\">" . \App\Utils::currency($item->amount) . "</td></tr>";
-            return "<table><tbody>
+              return "<table><tbody>
               <tr><th colspan=\"2\" style=\"text-align:left\">Itemizations</th></tr>
               {$rows}
               <tr>
@@ -77,29 +79,34 @@ class Utils
                 <td style=\"text-align:right;font-weight:bold\">" . \App\Utils::currency($invoice->amountDue) . "</td>
               </tr>
             </tbody></table>";
-          })($items),
-        'client.name' => $client->name ?? '',
-        'client.email' => $client->email ?? '',
-        'client.phone' => $client->phone ?? '',
-        'client.address' => $client->address ?? '',
-        'company' => $settings['company'] ?? '',
-        'website' => $settings['website'] ?? '',
-        'email' => $settings['email'] ?? '',
-        'phone' => $settings['phone'] ?? '',
-        'address' => $settings['address'] ?? '',
-        default => ''
-      };
-      return match ($mod) {
-        'ucase' => strtoupper($val),
-        'lcase' => strtolower($val),
-        'date' => date($arg ?? 'F j, Y', strtotime($val)),
-        'currency' => \App\Utils::currency((float) $val),
-        'link' => "<a href=\"https://{$val}{$arg}\">{$val}{$arg}</a>",
-        'mailto' => "<a href=\"mailto:{$val}\">{$val}</a>",
-        'tel' => "<a href=\"tel:{$val}\">{$val}</a>",
-        null => $val,
-        default => $val
-      };
-    }, $template);
+            })($items),
+          'client.name' => $client->name ?? '',
+          'client.email' => $client->email ?? '',
+          'client.phone' => $client->phone ?? '',
+          'client.address' => $client->address ?? '',
+          'company' => $settings['company'] ?? '',
+          'website' => $settings['website'] ?? '',
+          'email' => $settings['email'] ?? '',
+          'phone' => $settings['phone'] ?? '',
+          'address' => $settings['address'] ?? '',
+          default => $key ?? ''
+        };
+        return match ($mod) {
+          'ucase' => strtoupper($val),
+          'lcase' => strtolower($val),
+          'pre' => "<div style=\"white-space:pre-wrap\">{$val}</div>",
+          'date' => date($arg ?? 'M j, Y', strtotime($val ?? 'now')),
+          'currency' => \App\Utils::currency((float) $val),
+          'link' => "<a href=\"https://{$val}\" target=\"_blank\">" . ($arg ?? $val) . "</a>",
+          'mailto' => "<a href=\"mailto:{$val}\" target=\"_blank\">" . ($arg ?? $val) . "</a>",
+          'tel' => "<a href=\"tel:{$val}\" target=\"_blank\">" . ($arg ?? (!preg_match('/^\(\d{3}\) \d{3}-\d{4}$/', $val)
+            ? preg_replace('/(\d{3})-?(\d{3})-?(\d{4})/', '($1) $2-$3', $val)
+            : $val)) . "</a>",
+          null => $val,
+          default => $val
+        };
+      },
+      $template
+    );
   }
 }

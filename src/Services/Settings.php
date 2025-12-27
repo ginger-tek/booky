@@ -13,7 +13,8 @@ class Settings extends Service
 
   public function init(?string $userId = null): void
   {
-    $this->uid ??= $userId;
+    if (!$this->uid && $userId !== null)
+      $this->uid = $userId;
     $this->setBulk([
       'company' => 'My Company',
       'email' => 'info@mycompany.com',

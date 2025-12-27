@@ -10,7 +10,8 @@
     <form method="POST" action="/invoices">
       <label>Client
         <select name="clientId" required>
-          <option value="" disabled selected><?= empty($clients) ? 'No clients available. Add a client first' : 'Select a client' ?>
+          <option value="" disabled selected>
+            <?= empty($clients) ? 'No clients available. Add a client first' : 'Select a client' ?>
           </option>
           <?php foreach ($clients as $client): ?>
             <option value="<?= $client->id ?>"><?= htmlspecialchars($client->name) ?></option>
@@ -42,16 +43,14 @@
   <div id="invoices">
     <?php foreach ($items as $item): ?>
       <article>
-        <div class="flex spread">
-          <div>
-            <h3><?= $item->summary ?></h3>
-            <div><i class="bi bi-person-fill"></i> <?= $item->clientName ?></div>
-          </div>
-          <div align="right">
-            <h4><?= \App\Utils::currency($item->amountDue) ?></h4>
-            <div><i class="bi bi-alarm"></i> Due <?= \App\Utils::slashDate($item->dueDate) ?: 'TBD' ?></div>
-          </div>
-        </div>
+        <header>
+          <h3 class="bottom-clear"><?= $item->summary ?></h3>
+        </header>
+        <h4 class="bottom-clear flex fill">
+          <div class="center"><?= \App\Utils::currency($item->amountDue) ?></div>
+          <div class="center"><i class="bi bi-person-square"></i> <?= $item->clientName ?></div>
+          <div class="center"><i class="bi bi-calendar3"></i> <?= \App\Utils::slashDate($item->dueDate) ?: 'TBD' ?></div>
+        </h4>
         <a href="/invoices/<?= $item->id ?>" class="stretch"></a>
       </article>
     <?php endforeach ?>

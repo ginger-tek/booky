@@ -52,6 +52,7 @@ class Invoices extends Service
     return $this->db->run("select 
       i.id,
       i.summary,
+      i.clientId,
       c.name as clientName,
       i.amountDue,
       i.dueDate

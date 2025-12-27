@@ -22,8 +22,9 @@ try {
   $app->get('/signup', Auth::viewSignup(...));
   $app->post('/signup', Auth::postSignup(...));
   $app->get('/signup-success', Auth::viewSignupSuccess(...));
-  $app->get('/logout', Session::id(...), Auth::getLogout(...));
   $app->group('/', Session::id(...), function () use ($app) {
+    $app->get('/refresh', Auth::postExtendSession(...));
+    $app->get('/logout', Auth::getLogout(...));
     $app->get('/', fn() => $app->redirect('/dashboard'));
     $app->get('/dashboard', Dashboard::view(...));
     $app->group('/invoices', Invoices::routes(...));

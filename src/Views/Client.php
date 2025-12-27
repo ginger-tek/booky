@@ -12,9 +12,6 @@
 </dialog>
 <form id="clientForm" method="POST" action="/clients/<?= $client->id ?>">
   <div class="flex fill bottom-spacing">
-    <a role="button" class="secondary" href="/clients">
-      <i class="bi bi-arrow-left"></i> Back
-    </a>
     <button type="submit"><i class="bi bi-floppy"></i> Save</button>
     <button type="button" class="danger" onclick="this.blur();confirmDelete.showModal()"><i class="bi bi-trash"></i> Delete</button>
   </div>

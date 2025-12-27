@@ -28,6 +28,7 @@ class Auth
       'name' => $user->username
     ], 3600);
     setcookie('token', $token, $exp);
+    setcookie('exp', $exp, $exp);
     $app->redirect($app->getQuery('next') ?: '/dashboard');
   }
 
@@ -66,6 +67,20 @@ class Auth
     $app->render('Signup', [
       'error' => 'Failed to signup'
     ]);
+  }
+
+  public static function postExtendSession(Routy $app)
+  {
+    $session = $app->getCtx('session');
+    if (!$session)
+      return $app->end(401);
+    [$token, $exp] = Tokens::encode([
+      'uid' => $session->uid,
+      'name' => $session->name
+    ], 3600);
+    setcookie('token', $token, $exp);
+    setcookie('exp', $exp, $exp);
+    return $app->sendJson(['message' => 'Session extended', 'exp' => $exp]);
   }
 
   public static function viewSignup(Routy $app)

@@ -22,7 +22,7 @@
     <tbody>
       <?php if (empty($expenses)): ?>
         <tr>
-          <td colspan="3">
+          <td colspan="4">
             <div style="text-align:center">No expenses</div>
           </td>
         </tr>

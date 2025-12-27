@@ -44,11 +44,7 @@
 </dialog>
 <form id="invoiceForm" method="POST" action="/invoices/<?= $invoice->id ?>">
   <div class="flex fill bottom-spacing">
-    <a role="button" class="secondary" href="/invoices">
-      <i class="bi bi-arrow-left"></i> Back
-    </a>
     <button type="submit"><i class="bi bi-floppy"></i> Save</button>
-    <button type="button" id="previewBtn"><i class="bi bi-eye"></i> Preview</button>
     <button type="button" id="printBtn"><i class="bi bi-printer"></i> Print</button>
     <button type="button" class="danger" onclick="this.blur();confirmDelete.showModal()"><i class="bi bi-trash"></i>
       Delete</button>
@@ -126,7 +122,7 @@
               </select>
             </td>
             <td>
-              <input type="number" style="width:auto" name="amount" form="saveItem<?= $item->id ?>"
+              <input type="number" style="width:120px" name="amount" form="saveItem<?= $item->id ?>"
                 value="<?= $item->amount ?>" step="0.01" min="0" required>
             </td>
             <td>
@@ -149,6 +145,5 @@
 <script type="module">
   import { ctrlSave, printInvoice } from '/assets/utils.js'
   ctrlSave(document.getElementById('invoiceForm'))
-  previewBtn.onclick = () => printInvoice('<?= $invoice->id ?>')
-  printBtn.onclick = () => printInvoice('<?= $invoice->id ?>', true)
+  printBtn.onclick = () => printInvoice('<?= $invoice->id ?>')
 </script>

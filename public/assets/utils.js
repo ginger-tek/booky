@@ -53,14 +53,72 @@ export function initFilterChildElements(container, searchInput, emptyText) {
   }
 }
 
-export function printInvoice(invoiceId, print = false) {
+export function printInvoice(invoiceId) {
   const printWindow = window.open(`/invoices/${invoiceId}/print`, `Invoice #${invoiceId}`);
   printWindow.onload = () => {
     setTimeout(() => {
-      if (print) {
-        printWindow.print();
-        printWindow.close();
-      }
+      printWindow.print();
+      printWindow.close();
     });
   };
+}
+
+export async function confirmAsync(message) {
+  if (!message) throw new Error('Message is required');
+  return new Promise((resolve) => {
+    const dialog = document.createElement('dialog');
+    dialog.innerHTML = `<article>
+      <h3>Confirm</h3>
+      <p>${message}</p>
+      <menu>
+        <button value="cancel">Cancel</button>
+        <button value="confirm" autofocus>OK</button>
+      </menu>
+    </article>`
+    dialog.addEventListener('close', () => {
+      resolve(dialog.returnValue === 'confirm');
+      setTimeout(() => document.body.removeChild(dialog), 300);
+    });
+  });
+}
+
+export async function startSessionTimer() {
+  let warningTimer;
+  let logoutTimer;
+  const exp = await cookieStore.get('exp');
+  if (!exp) return;
+  const expTime = parseInt(exp.value) * 1000;
+  const warningTime = expTime - 60000; // 1 minute before expiration
+  console.log('Session expiration time:', new Date(expTime).toLocaleString());
+  console.log('Session warning time:', new Date(warningTime).toLocaleString());
+  const currentTime = Date.now();
+  console.log(`Session time left: 00:${Math.floor((expTime - currentTime) / 1000 / 60)}:${Math.round((expTime - currentTime) / 1000 / 60 % 1 * 60).toString().padStart(2, '0')}`);
+  if (currentTime >= expTime) {
+    alert('Your session has expired. You will be logged out.');
+    window.location.href = '/logout';
+    return;
+  }
+  const timeUntilWarning = warningTime - currentTime;
+  warningTimer = setTimeout(async () => {
+    const extend = await confirmAsync('Your session is about to expire. Do you want to extend your session?');
+    if (extend) {
+      fetch('/refresh', {
+        method: 'POST',
+        credentials: 'include'
+      })
+        .then(() => location.reload())
+        .catch(() => {
+          alert('Failed to extend session. You will be logged out.');
+          window.location.href = '/logout';
+        });
+    } else {
+      alert('You will be logged out due to inactivity.');
+      window.location.href = '/logout';
+    }
+  }, timeUntilWarning);
+  const timeUntilLogout = expTime - currentTime;
+  logoutTimer = setTimeout(() => {
+    alert('Your session has expired. You will be logged out.');
+    window.location.href = '/logout';
+  }, timeUntilLogout);
 }

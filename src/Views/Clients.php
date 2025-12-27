@@ -32,9 +32,20 @@
   <div id="clients">
     <?php foreach ($items as $item): ?>
       <article>
-        <h3><?= $item->name ?></h3>
-        <?= $item->email ?> | <?= $item->phone ?>
-        <a href="/clients/<?= $item->id ?>" class="stretch"></a>
+        <header>
+          <h3 class="bottom-clear"><?= $item->name ?></h3>
+          <a href="/clients/<?= $item->id ?>" class="stretch"></a>
+        </header>
+        <div class="flex fill">
+          <a role="button" href="mailto:<?= $item->email ?>"><i class="bi bi-envelope"></i> Email</a>
+          <?php if (!empty($item->phone)): ?>
+            <a role="button" href="tel:<?= $item->phone ?>"><i class="bi bi-telephone"></i> Call</a>
+          <?php endif ?>
+          <?php if (!empty($item->address)): ?>
+            <a role="button" href="https://maps.google.com/?q=<?= urlencode($item->address) ?>"><i class="bi bi-geo-alt"></i>
+              Map</a>
+          <?php endif ?>
+        </div>
       </article>
     <?php endforeach ?>
   </div>
