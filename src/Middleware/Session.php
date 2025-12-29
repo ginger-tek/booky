@@ -22,8 +22,14 @@ class Session
   public static function id(Routy $app)
   {
     self::init($app);
-    if (!($sess = $app->getCtx('session')))
-      return $app->redirect('/login?next=' . urlencode($_SERVER['REQUEST_URI']));
+    if (!($sess = $app->getCtx('session'))) {
+      $params = !in_array($_SERVER['REQUEST_URI'], ['/', '/refresh', '/login', '/logout'])
+        ? '?' . http_build_query(['next' => $_SERVER['REQUEST_URI']])
+        : '';
+      $app->uri == '/refresh'
+        ? $app->end(401)
+        : $app->redirect("/login$params");
+    }
     if (!($user = (new Users)->get($sess->uid))) {
       setcookie('token', '', time() - 60);
       return $app->end(401);

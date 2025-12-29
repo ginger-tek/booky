@@ -14,11 +14,11 @@
             </header>
             <div class="overflow-auto" style="max-height:75dvh">
               <h4>Syntax</h4>
-              <p>Use the <code>{{ token }}</code> syntax to render values for invoice, client, and settings, or plain
-                strings, into the template. If the token doesn't match any of the following, the string will be used as is.
+              <p>Use the <code>{{ token }}</code> syntax to render values for invoice/client/settings or plain strings into
+                the template. If the token doesn't match any of the following, the string will be used as is.
               </p>
               <p>Available tokens:</p>
-              <div class="grid">
+              <div class="grid sm">
                 <ul>
                   <li><code>invoice.id</code></li>
                   <li><code>invoice.summary</code></li>
@@ -46,9 +46,9 @@
               <article class="alert info"><code>itemizationsTable</code> is a special token that renders a pre-formatted
                 table of the invoice items.</article>
               <h4>Formatting Modifiers</h4>
-              <p>You can apply formatting to the token values or plain strings using the pipe <code>|</code> character, and
-                an optional second argument prepended by a colon <code>:</code> character. The following formatting
-                modifiers are available:</p>
+              <p>You can apply formatting to the token values or plain strings using the pipe (<code>|</code>) character,
+                and an optional second argument, if applicable, prepended by a colon (<code>:</code>) character. The
+                following formatting modifiers are available:</p>
               <ul>
                 <li><code>lcase</code> - converts a string to lowercase</li>
                 <li><code>ucase</code> - converts a string to uppercase</li>

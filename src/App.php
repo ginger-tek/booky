@@ -23,7 +23,7 @@ try {
   $app->post('/signup', Auth::postSignup(...));
   $app->get('/signup-success', Auth::viewSignupSuccess(...));
   $app->group('/', Session::id(...), function () use ($app) {
-    $app->get('/refresh', Auth::postExtendSession(...));
+    $app->post('/refresh', Auth::postExtendSession(...));
     $app->get('/logout', Auth::getLogout(...));
     $app->get('/', fn() => $app->redirect('/dashboard'));
     $app->get('/dashboard', Dashboard::view(...));

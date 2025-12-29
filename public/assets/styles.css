@@ -188,6 +188,12 @@ label:has([required])::before {
   }
 }
 
+@media (min-width: 400px) {
+  .grid.sm {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+
 textarea.code {
   font-family: monospace;
   font-size: .9rem;

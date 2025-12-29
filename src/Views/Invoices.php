@@ -46,10 +46,10 @@
         <header>
           <h3 class="bottom-clear"><?= $item->summary ?></h3>
         </header>
-        <div class="grid fill">
-          <div class="center"><?= \App\Utils::currency($item->amountDue) ?></div>
-          <div class="center"><i class="bi bi-person-square"></i> <?= $item->clientName ?></div>
-          <div class="center"><i class="bi bi-calendar3"></i> <?= \App\Utils::slashDate($item->dueDate) ?: 'TBD' ?></div>
+        <div>
+          <b><?= \App\Utils::currency($item->amountDue) ?></b>
+          owed by <b><?= $item->clientName ?></b>
+          <?= $item->dueDate ? 'before/on <b>' . \App\Utils::slashDate($item->dueDate) . '</b>' : '' ?>
         </div>
         <a href="/invoices/<?= $item->id ?>" class="stretch"></a>
       </article>
