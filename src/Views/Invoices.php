@@ -19,7 +19,7 @@
         </select>
       </label>
       <label>Summary
-        <input type="text" name="summary" autocomplete="off" required>
+        <input type="text" name="summary" autocomplete="off" autofocus required>
       </label>
       <div class="flex fill">
         <button type="button" class="secondary" onclick="newInvoice.close()">Cancel</button>

@@ -47,13 +47,13 @@ class Utils
     return $_REQUEST[$key] ?? null;
   }
 
-  public static function parseTemplate(string $template, array $ctx): string
+  public static function parseMarkup(string $markup, array $ctx): string
   {
-    ['invoice' => $invoice, 'client' => $client, 'items' => $items, 'settings' => $settings] = $ctx;
+    ['invoice' => $invoice, 'client' => $client, 'items' => $items] = $ctx;
     return preg_replace_callback(
-      '/{{\s*(?<key>[\w\.\/:&?]+)\s*(?:\|\s*(?<mod>\w+)\s*(?::\s*(?<arg>.*?))?)?\s*}}/sm',
-      function ($matches) use ($invoice, $client, $items, $settings) {
-        $key = $matches['key'];
+      '/{{\s*(?<key>[\w\.,\s\/\\\:&?@%]+)\s*(?:\|\s*(?<mod>\w+)\s*(?:\:\s*(?<arg>.*?))?)?\s*}}/m',
+      function ($matches) use ($invoice, $client, $items) {
+        $key = trim($matches['key']);
         $mod = $matches['mod'] ?? null;
         $arg = $matches['arg'] ?? null;
         $val = match ($key) {
@@ -84,12 +84,7 @@ class Utils
           'client.email' => $client->email ?? '',
           'client.phone' => $client->phone ?? '',
           'client.address' => $client->address ?? '',
-          'company' => $settings['company'] ?? '',
-          'website' => $settings['website'] ?? '',
-          'email' => $settings['email'] ?? '',
-          'phone' => $settings['phone'] ?? '',
-          'address' => $settings['address'] ?? '',
-          default => $key ?? ''
+          default => preg_replace('#\\\r\\\n#', "\n", $key ?? '')
         };
         return match ($mod) {
           'ucase' => strtoupper($val),
@@ -106,7 +101,7 @@ class Utils
           default => $val
         };
       },
-      $template
+      $markup
     );
   }
 }

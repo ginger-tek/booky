@@ -32,6 +32,7 @@
                 <li dir="ltr"><a href="/invoices"><i class="bi bi-receipt"></i> Invoices</a></li>
                 <li dir="ltr"><a href="/clients"><i class="bi bi-people"></i> Clients</a></li>
                 <li dir="ltr"><a href="/expenses"><i class="bi bi-journal-text"></i> Expenses</a></li>
+                <li dir="ltr"><a href="/templates"><i class="bi bi-file-earmark-text"></i> Templates</a></li>
                 <li dir="ltr"><a href="/settings"><i class="bi bi-gear"></i> Settings</a></li>
                 <li>
                   <hr>

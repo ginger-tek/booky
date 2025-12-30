@@ -3,55 +3,49 @@
 namespace App\Controllers;
 
 use GingerTek\Routy;
-use App\Services\Settings as SettingsService;
+use App\Services\Users;
 
 class Settings
 {
   public static function routes(Routy $app)
   {
-    $app->post('/', self::postSave(...));
+    $app->post('/update-user', self::postUpdateUser(...));
+    $app->post('/update-password', self::postUpdatePassword(...));
     $app->get('/', self::view(...));
-    $app->post('/:id/delete', self::postDeleteOne(...));
-  }
-
-  public static function postCreate(Routy $app)
-  {
-    $data = $app->getBody();
-    (new SettingsService)->set(
-      (string) $data->name,
-      (string) $data->value
-    );
-    $app->redirect('/settings');
   }
 
   public static function view(Routy $app)
   {
-    $settings = (new SettingsService)->list();
-    $app->render('Settings', [
-      'settings' => $settings
-    ]);
+    $app->render('Settings');
   }
 
-  public static function postSave(Routy $app)
+  public static function postUpdateUser(Routy $app)
   {
     $data = $app->getBody();
-    (new SettingsService)->setBulk(
-      [
-        'company' => trim($data->company ?? ''),
-        'website' => trim(str_replace('https://', '', $data->website ?? '')),
-        'email' => trim($data->email ?? ''),
-        'phone' => trim($data->phone ?? ''),
-        'address' => trim($data->address ?? ''),
-        'template' => $data->template ?? ''
-      ]
-    );
+    (new Users)->update([
+      'email' => (string) $data->email,
+      'name' => (string) $data->name
+    ]);
     $app->redirect('/settings');
   }
 
-  public static function postDeleteOne(Routy $app)
+  public static function postUpdatePassword(Routy $app)
   {
-    $id = $app->getParam('id');
-    (new SettingsService)->delete($id);
-    $app->redirect("/settings");
+    $data = $app->getBody();
+    $userSvc = new Users;
+    $user = $userSvc->get($app->getCtx('user')->id);
+    if (!$user || !password_verify($data->currentPassword ?? '', $user->passhash)) {
+      return $app->render('Settings', [
+        'error' => 'Current password is incorrect'
+      ]);
+    }
+    if (($data->newPassword ?? '') !== ($data->confirmNewPass ?? '')) {
+      return $app->render('Settings', [
+        'error' => 'New passwords do not match'
+      ]);
+    }
+    $newHash = password_hash($data->newPassword, PASSWORD_BCRYPT);
+    $userSvc->updatePassword($newHash);
+    $app->redirect('/settings');
   }
 }

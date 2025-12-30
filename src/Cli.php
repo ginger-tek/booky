@@ -39,7 +39,7 @@ try {
       $email = $argv[4] ?? null;
       $passhash = password_hash($argv[5], PASSWORD_DEFAULT);
       $user = (new \App\Services\Users)->create($username, $email, $passhash);
-      (new \App\Services\Settings)->init($user->id);
+      (new \App\Services\Templates)->init($user->id);
       echo "User created with ID $user->id\n";
     } elseif ($subAction === 'enable' && isset($argv[3])) {
       $userId = $argv[3] ?? null;

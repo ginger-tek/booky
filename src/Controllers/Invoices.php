@@ -6,7 +6,7 @@ use GingerTek\Routy;
 use App\Data\Database;
 use App\Services\Invoices as InvService;
 use App\Services\Clients;
-use App\Services\Settings;
+use App\Services\Templates;
 
 class Invoices
 {
@@ -72,7 +72,7 @@ class Invoices
     $id = $app->getParam('id');
     $db = new Database;
     $invSvc = new InvService($db);
-    $settingsSvc = new Settings($db);
+    $templatesSvc = new Templates($db);
     $invoice = $invSvc->get($id);
     if (!$invoice)
       return $app->render('NotFound', [
@@ -81,13 +81,11 @@ class Invoices
     $client = (new Clients($db))->get($invoice->clientId);
     $items = $invSvc->listItems($id);
     ob_start();
-    $settings = $settingsSvc->list(true);
-    $template = $settings['template'] ?? '<h1>Invoice Template</h1>';
-    $result = \App\Utils::parseTemplate($template, [
+    $template = $templatesSvc->getDefault() ?: '<h1>Invoice Template</h1>';
+    $result = \App\Utils::parseMarkup($template->markup, [
       'invoice' => $invoice,
       'client' => $client,
-      'items' => $items,
-      'settings' => $settings
+      'items' => $items
     ]);
     exit($result);
   }

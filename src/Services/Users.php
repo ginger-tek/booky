@@ -47,45 +47,57 @@ class Users extends Service
     $clauses")->fetchAll();
   }
 
-  public function update(string $userId, array $data): ?object
+  public function update(array $data, ?string $userId = null): ?object
   {
     $this->db->run("update users
-    set passhash = ?,
+    set username = ?,
     email = ?,
     updated = current_timestamp
     where id = ?", [
-      $data['passhash'],
+      $data['username'],
       $data['email'],
-      $userId
+      $this->uid ?: $userId
     ]);
-    return $this->get($userId, null);
+    return $this->get($userId ?: $this->uid, null);
   }
 
-  public function enable(string $userId): bool
+  public function updatePassword(string $passhash, ?string $userId = null): ?object
+  {
+    $this->db->run("update users
+    set passhash = ?,
+    updated = current_timestamp
+    where id = ?", [
+      $passhash,
+      $userId ?: $this->uid
+    ]);
+    return $this->get($userId ?: $this->uid, null);
+  }
+
+  public function enable(?string $userId = null): bool
   {
     return $this->db->run("update users
     set enabled = 1,
     updated = current_timestamp
     where id = ?", [
-      $userId
+      $userId ?: $this->uid
     ])->rowCount() == 1;
   }
 
-  public function disable(string $userId): bool
+  public function disable(?string $userId = null): bool
   {
     return $this->db->run("update users
     set enabled = 0,
     updated = current_timestamp
     where id = ?", [
-      $userId
+      $userId ?: $this->uid
     ])->rowCount() == 1;
   }
 
-  public function delete(string $userId): bool
+  public function delete(?string $userId = null): bool
   {
     return $this->db->run("delete from users
     where id = ?", [
-      $userId
+      $userId ?: $this->uid
     ])->rowCount() == 1;
   }
 }

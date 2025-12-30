@@ -8,7 +8,7 @@
     <header><b>New Client</b></header>
     <form method="POST" action="/clients">
       <label>Name
-        <input type="text" autocomplete="off" name="name" id="name" required>
+        <input type="text" name="name" autocomplete="off" autofocus required>
       </label>
       <div class="flex fill">
         <button type="button" class="secondary" onclick="newClient.close()">Cancel</button>

@@ -8,6 +8,7 @@ use App\Controllers\Dashboard;
 use App\Controllers\Invoices;
 use App\Controllers\Clients;
 use App\Controllers\Settings;
+use App\Controllers\Templates;
 
 \App\Services\Config::load();
 
@@ -30,6 +31,7 @@ try {
     $app->group('/invoices', Invoices::routes(...));
     $app->group('/clients', Clients::routes(...));
     $app->get('/expenses', Dashboard::viewExpenses(...));
+    $app->group('/templates', Templates::routes(...));
     $app->group('/settings', Settings::routes(...));
   });
   $app->fallback(fn() => $app->render('NotFound', ['title' => 'Page Not Found']));

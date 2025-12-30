@@ -5,7 +5,7 @@ namespace App\Controllers;
 use GingerTek\Routy;
 use App\Services\Users;
 use App\Services\Tokens;
-use App\Services\Settings;
+use App\Services\Templates;
 use App\Utils;
 use App\Data\Database;
 
@@ -59,8 +59,7 @@ class Auth
       ]);
     $hash = password_hash($body->password, PASSWORD_BCRYPT);
     if ($user = $userSvc->create($body->username, $body->email, $hash)) {
-      Utils::reqSet('uid', $user->id);
-      (new Settings($db))->init();
+      (new Templates($db))->init($user->id);
       return $app->redirect('/account-setup');
     }
     $app->render('Signup', [
