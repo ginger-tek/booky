@@ -57,8 +57,8 @@ export function initFilterChildElements(container, searchInput, emptyText) {
   }
 }
 
-export function printInvoice(invoiceId) {
-  const printWindow = window.open(`/invoices/${invoiceId}/print`, `Invoice #${invoiceId}`);
+export function printInvoice(invoiceId, templateId) {
+  const printWindow = window.open(`/invoices/${invoiceId}/print${templateId ? `?templateId=${templateId}` : ''}`, `Invoice #${invoiceId}`);
   printWindow.onload = () => {
     setTimeout(() => {
       printWindow.print();

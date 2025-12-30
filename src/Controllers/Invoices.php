@@ -59,17 +59,20 @@ class Invoices
         'error' => 'Invoice not found'
       ]);
     $clients = (new Clients($db))->list();
+    $templates = (new Templates($db))->list();
     $items = $invSvc->listItems($id);
     $app->render('Invoice', [
       'invoice' => $invoice,
       'clients' => $clients,
-      'items' => $items
+      'items' => $items,
+      'templates' => $templates
     ]);
   }
 
   public static function viewPrint(Routy $app)
   {
     $id = $app->getParam('id');
+    $templateId = $app->getQuery('templateId');
     $db = new Database;
     $invSvc = new InvService($db);
     $templatesSvc = new Templates($db);
@@ -81,7 +84,9 @@ class Invoices
     $client = (new Clients($db))->get($invoice->clientId);
     $items = $invSvc->listItems($id);
     ob_start();
-    $template = $templatesSvc->getDefault() ?: '<h1>Invoice Template</h1>';
+    $template = $templateId ? $templatesSvc->get($templateId) : $templatesSvc->getDefault();
+    if (!$template)
+      $template = (object) ['markup' => '<h1>Invoice Template</h1>'];
     $result = \App\Utils::parseMarkup($template->markup, [
       'invoice' => $invoice,
       'client' => $client,

@@ -93,6 +93,11 @@ class Auth
   public static function getLogout(Routy $app)
   {
     setcookie('token', '', time() - 60);
-    $app->redirect('/login');
+    $app->redirect('/logged-out');
+  }
+
+  public static function viewLoggedOut(Routy $app)
+  {
+    $app->render('LoggedOut');
   }
 }

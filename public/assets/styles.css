@@ -129,6 +129,10 @@ details.dropdown>summary+ul li:has(>hr) {
   &.spread {
     justify-content: space-between;
   }
+
+  &.wrap {
+    flex-wrap: wrap;
+  }
 }
 
 table tr td {

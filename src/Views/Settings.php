@@ -4,11 +4,12 @@
       <h2>User Settings</h2>
       <button type="submit" style="width:auto"><i class="bi bi-floppy"></i> Save</button>
     </div>
+    <article class="alert info">Username cannot be changed</article>
     <label>Username
-      <input type="text" value="<?= $user->username ?>" required>
+      <input type="text" value="<?= $user->username ?>" disabled readonly>
     </label>
     <label>Email
-      <input type="email" value="<?= $user->email ?>" required>
+      <input type="email" name="email" value="<?= $user->email ?>" required>
     </label>
   </form>
 </article>

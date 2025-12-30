@@ -34,9 +34,11 @@
   <div id="templates">
     <?php foreach ($items as $item): ?>
       <article>
-        <div class="flex spread">
-          <h3 class="bottom-clear"><?= $item->isDefault == 1 ? '<i class="bi bi-star-fill"></i> ' : '' ?><?= $item->name ?></h3>
-          <div>Created <?= \App\Utils::slashDate($item->created) ?></div>
+        <div class="flex spread wrap">
+          <h3 class="bottom-clear"><?= $item->isDefault == 1 ? '<i class="bi bi-star-fill"></i> ' : '' ?><?= $item->name ?>
+          </h3>
+          <div>Created <?= \App\Utils::slashDate($item->created) ?> | Updated <?= \App\Utils::slashDate($item->updated) ?>
+          </div>
         </div>
         <a href="/templates/<?= $item->id ?>" class="stretch"></a>
       </article>

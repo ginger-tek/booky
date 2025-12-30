@@ -3,6 +3,7 @@
  * @var object $invoice
  * @var object[] $clients
  * @var object[] $items
+ * @var \App\Models\TemplateListItem[] $templates
  */
 ?>
 <dialog id="newItem">
@@ -30,6 +31,24 @@
     </form>
   </article>
 </dialog>
+<dialog id="selectTemplate">
+  <article>
+    <header><b>Select Template</b></header>
+    <label>Template
+      <select id="templateId" required>
+        <?php foreach ($templates as $template): ?>
+          <option value="<?= $template->id ?>" <?= count($templates) == 1 ? 'selected' : '' ?>>
+            <?= $template->isDefault ? '(Default)' : '' ?> <?= $template->name ?>
+          </option>
+        <?php endforeach ?>
+      </select>
+    </label>
+    <div class="flex fill">
+      <button type="button" class="secondary" onclick="selectTemplate.close()">Cancel</button>
+      <button type="button" id="printBtn">Print</button>
+    </div>
+  </article>
+</dialog>
 <dialog id="confirmDelete">
   <article>
     <header><b>Confirm Delete</b></header>
@@ -45,7 +64,7 @@
 <form id="invoiceForm" method="POST" action="/invoices/<?= $invoice->id ?>">
   <div class="flex fill bottom-spacing">
     <button type="submit"><i class="bi bi-floppy"></i> Save</button>
-    <button type="button" id="printBtn"><i class="bi bi-printer"></i> Print</button>
+    <button type="button" onclick="this.blur();selectTemplate.showModal()"><i class="bi bi-printer"></i> Print</button>
     <button type="button" class="danger" onclick="this.blur();confirmDelete.showModal()"><i class="bi bi-trash"></i>
       Delete</button>
   </div>
@@ -145,5 +164,8 @@
 <script type="module">
   import { ctrlSave, printInvoice } from '/assets/utils.js'
   ctrlSave(document.getElementById('invoiceForm'))
-  printBtn.onclick = () => printInvoice('<?= $invoice->id ?>')
+  printBtn.onclick = () => {
+    selectTemplate.close()
+    printInvoice('<?= $invoice->id ?>', templateId.value)
+  }
 </script>

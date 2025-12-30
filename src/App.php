@@ -23,6 +23,7 @@ try {
   $app->get('/signup', Auth::viewSignup(...));
   $app->post('/signup', Auth::postSignup(...));
   $app->get('/signup-success', Auth::viewSignupSuccess(...));
+  $app->get('/logged-out', Auth::viewLoggedOut(...));
   $app->group('/', Session::id(...), function () use ($app) {
     $app->post('/refresh', Auth::postExtendSession(...));
     $app->get('/logout', Auth::getLogout(...));
