@@ -1,5 +1,5 @@
 <div class="center-form">
-  <form method="POST" action="/signup">
+  <form id="signupForm" method="POST" action="/signup">
     <h2 class="center">Signup</h2>
     <article class="alert danger"><?= $error ?? '' ?></article>
     <label>Username
@@ -29,6 +29,7 @@
   <p>Already have an account? <a href="/login">Login here</a>.</p>
 </div>
 <script type="module">
-  import { togglePasswordVisibility } from '/assets/utils.js'
+  import { configFormSubmit, togglePasswordVisibility } from '/assets/utils.js'
+  configFormSubmit('#signupForm')
   togglePasswordVisibility()
 </script>

@@ -14,7 +14,7 @@
             <?= empty($clients) ? 'No clients available. Add a client first' : 'Select a client' ?>
           </option>
           <?php foreach ($clients as $client): ?>
-            <option value="<?= $client->id ?>"><?= htmlspecialchars($client->name) ?></option>
+            <option value="<?= $client->id ?>" <?= count($clients) == 1 ? 'selected' : '' ?>><?= htmlspecialchars($client->name) ?></option>
           <?php endforeach ?>
         </select>
       </label>

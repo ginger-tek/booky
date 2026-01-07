@@ -50,7 +50,7 @@ class Clients
   {
     $id = $app->getParam('id');
     $data = $app->getBody();
-    (new CliService)->update(
+    $client = (new CliService)->update(
       $id,
       [
         'name' => (string) $data->name,
@@ -59,6 +59,8 @@ class Clients
         'address' => (string) $data->address
       ]
     );
+    if ($app->getHeader('Accept') === 'application/json')
+      return $app->sendJson($client);
     $app->redirect("/clients/{$id}");
   }
 

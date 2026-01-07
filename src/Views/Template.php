@@ -67,7 +67,7 @@
     </div>
   </article>
 </dialog>
-<form method="POST" action="/templates/<?= $template->id ?>">
+<form id="templateForm" method="POST" action="/templates/<?= $template->id ?>">
   <div class="flex fill bottom-spacing">
     <button type="submit"><i class="bi bi-floppy"></i> Save</button>
     <button type="button" class="danger" onclick="this.blur();confirmDelete.showModal()"><i class="bi bi-trash"></i>
@@ -83,7 +83,7 @@
   <label>Markup / Preview <span onclick="templateHelp.showModal()" aria-describedby="templateHelp">
       <i class="bi bi-question-circle"></i></span></label>
   <div class="grid">
-    <textarea class="code" name="markup" rows="15"
+    <textarea class="code bottom-clear" name="markup" rows="15"
       onkeyup="clearTimeout(window.b);window.b = setTimeout(() => this.nextElementSibling.srcdoc=this.value, 300)"
       required><?= htmlspecialchars($template->markup) ?></textarea>
     <iframe srcdoc="<?= htmlspecialchars($template->markup) ?>" class="bottom-spacing"
@@ -91,6 +91,8 @@
   </div>
 </form>
 <script type="module">
-  import { ctrlSave } from '/assets/utils.js'
-  ctrlSave(document.querySelector('form'))
+  import { configFormSubmit } from '/assets/utils.js'
+  configFormSubmit('#templateForm', {
+    ctrlSave: true
+  })
 </script>

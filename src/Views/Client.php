@@ -31,6 +31,8 @@
   </label>
 </form>
 <script type="module">
-  import { ctrlSave } from '/assets/utils.js'
-  ctrlSave(document.getElementById('clientForm'))
+  import { configFormSubmit } from '/assets/utils.js'
+  configFormSubmit('#clientForm', {
+    ctrlSave: true
+  })
 </script>

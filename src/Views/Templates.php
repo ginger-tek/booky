@@ -1,4 +1,5 @@
 <?php
+
 /** 
  * @var \App\Models\TemplateListItem[] $items 
  * @var object[] $clients
@@ -44,8 +45,12 @@
       </article>
     <?php endforeach ?>
   </div>
-  <script type="module">
-    import { initFilterChildElements } from '/assets/utils.js'
-    initFilterChildElements(templates, search, 'No templates found');
-  </script>
 <?php endif ?>
+<script type="module">
+  import {
+    configFormSubmit,
+    initFilterChildElements,
+  } from '/assets/utils.js'
+  configFormSubmit('#newTemplate form')
+  initFilterChildElements(templates, search, 'No templates found');
+</script>

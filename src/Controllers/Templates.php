@@ -50,7 +50,7 @@ class Templates
   {
     $id = $app->getParam('id');
     $data = $app->getBody();
-    (new TemplatesService)->update(
+    $template = (new TemplatesService)->update(
       $id,
       [
         'name' => (string) $data->name,
@@ -58,6 +58,8 @@ class Templates
         'markup' => (string) $data->markup
       ]
     );
+    if ($app->getHeader('Accept') === 'application/json')
+      return $app->sendJson($template);
     $app->redirect("/templates/{$id}");
   }
 

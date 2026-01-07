@@ -110,6 +110,8 @@ class Invoices
         'paidDate' => (string) $data->paidDate
       ]
     );
+    if ($app->getHeader('Accept') === 'application/json')
+      return $app->sendJson($invoice);
     $app->redirect("/invoices/{$invoice->id}");
   }
 
@@ -138,7 +140,7 @@ class Invoices
     $id = $app->getParam('id');
     $itemId = $app->getParam('itemId');
     $data = $app->getBody();
-    (new InvService)->updateItem(
+    $item = (new InvService)->updateItem(
       $itemId,
       [
         'summary' => (string) $data->summary,
@@ -146,6 +148,8 @@ class Invoices
         'amount' => (float) $data->amount
       ]
     );
+    if ($app->getHeader('Accept') === 'application/json')
+      return $app->sendJson($item);
     $app->redirect("/invoices/{$id}");
   }
 

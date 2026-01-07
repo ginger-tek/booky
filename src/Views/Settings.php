@@ -1,5 +1,5 @@
 <article>
-  <form method="post" action="/settings/update-user">
+  <form id="updateUser" method="post" action="/settings/update-user">
     <div class="flex spread bottom-spacing">
       <h2>User Settings</h2>
       <button type="submit" style="width:auto"><i class="bi bi-floppy"></i> Save</button>
@@ -14,7 +14,7 @@
   </form>
 </article>
 <article>
-  <form method="post" action="/settings/update-password">
+  <form id="updatePassword" method="post" action="/settings/update-password">
     <h2>Change Password</h2>
     <article class="alert info">Password must be 12 or more characters long, and include at least one of each of the
       following:
@@ -42,7 +42,13 @@
   </form>
 </article>
 <script type="module">
-  import { ctrlSave, togglePasswordVisibility } from '/assets/utils.js'
-  ctrlSave(document.querySelector('form'))
+  import {
+    configFormSubmit,
+    togglePasswordVisibility,
+  } from '/assets/utils.js'
+  configFormSubmit('#updateUser', {
+    ctrlSave: true
+  });
+  configFormSubmit('#updatePassword');
   togglePasswordVisibility()
 </script>

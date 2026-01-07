@@ -23,6 +23,7 @@ class Settings
   {
     $data = $app->getBody();
     (new Users)->update([
+      'username' => (string) $app->getCtx('user')->username,
       'email' => (string) $data->email
     ]);
     $app->redirect('/settings');

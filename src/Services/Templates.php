@@ -64,7 +64,7 @@ class Templates extends Service
     ])->fetch() ?: null;
   }
 
-  public function update(string $id, ?array $data = []): void
+  public function update(string $id, ?array $data = []): ?object
   {
     if (isset($data['isDefault']) && $data['isDefault'] == 1)
       $this->db->run('update templates set isDefault = 0
@@ -84,6 +84,7 @@ class Templates extends Service
       ':markup' => $data['markup'],
       ':userId' => $this->uid
     ]);
+    return $this->get($id);
   }
 
   public function delete(string $id): void

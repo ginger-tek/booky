@@ -1,4 +1,5 @@
 <?php
+
 /** 
  * @var object $invoice
  * @var object[] $clients
@@ -150,8 +151,8 @@
               <form method="POST" id="deleteItem<?= $item->id ?>"
                 action="/invoices/<?= $invoice->id ?>/items/<?= $item->id ?>/delete"></form>
               <div class="flex">
-                <button type="submit" form="saveItem<?= $item->id ?>"><i class="bi bi-floppy"></i> Save</button>
-                <button type="submit" form="deleteItem<?= $item->id ?>" class="danger"><i class="bi bi-trash"></i>
+                <button id="saveItemBtn<?= $item->id ?>" type="submit" form="saveItem<?= $item->id ?>"><i class="bi bi-floppy"></i> Save</button>
+                <button id="deleteItemBtn<?= $item->id ?>" type="submit" form="deleteItem<?= $item->id ?>" class="danger"><i class="bi bi-trash"></i>
                   Delete</button>
               </div>
             </td>
@@ -162,8 +163,28 @@
   </div>
 <?php endif ?>
 <script type="module">
-  import { ctrlSave, printInvoice } from '/assets/utils.js'
-  ctrlSave(document.getElementById('invoiceForm'))
+  import {
+    configFormSubmit,
+    printInvoice
+  } from '/assets/utils.js'
+  configFormSubmit('#invoiceForm', {
+    ctrlSave: true,
+    asyncCallback: async (data) => {
+      console.log('Invoice saved', data)
+    }
+  })
+  configFormSubmit('#newItem form')
+  document.querySelectorAll('form[id^="saveItem"]').forEach(form => {
+    configFormSubmit(form, {
+      findSubmit: (form) => document.querySelector(`#saveItemBtn${form.id.replace('saveItem', '')}`)
+    })
+  })
+  document.querySelectorAll('form[id^="deleteItem"]').forEach(form => {
+    configFormSubmit(form, {
+      confirm: { title: 'Confirm Delete', message: 'This action cannot be undone. Are you sure you want to delete this item?', yes: 'Yes, Delete', no: 'No' },
+      findSubmit: (form) => document.querySelector(`#deleteItemBtn${form.id.replace('deleteItem', '')}`),
+    })
+  })
   printBtn.onclick = () => {
     selectTemplate.close()
     printInvoice('<?= $invoice->id ?>', templateId.value)
