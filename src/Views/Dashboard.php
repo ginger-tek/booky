@@ -22,16 +22,16 @@
 <article style="position:relative;width:100%;height:30vh">
   <canvas id="monthChart"></canvas>
 </article>
-<div class="grid">
-  <article align="center">
+<div class="grid shrink">
+  <article align="center" class="bg blue">
     <label>Revenue</label>
     <h2><?= \App\Utils::currency($revenue) ?></h2>
   </article>
-  <article align="center">
+  <article align="center" class="bg pink">
     <label>Expenses</label>
     <h2><?= \App\Utils::currency($expenses) ?></h2>
   </article>
-  <article align="center">
+  <article align="center" class="bg jade">
     <label>Income</label>
     <h2><?= \App\Utils::currency($income) ?></h2>
   </article>
@@ -48,22 +48,26 @@
 <article style="position:relative;width:100%;height:30vh">
   <canvas id="yearChart"></canvas>
 </article>
-<div class="grid">
-  <article align="center">
+<div class="grid shrink">
+  <article align="center" class="bg blue">
     <label>Revenue</label>
     <h2><?= \App\Utils::currency($revenueYTD) ?></h2>
   </article>
-  <article align="center">
+  <article align="center" class="bg pink">
     <label>Expenses</label>
     <h2><?= \App\Utils::currency($expensesYTD) ?></h2>
   </article>
-  <article align="center">
+  <article align="center" class="bg jade">
     <label>Income</label>
     <h2><?= \App\Utils::currency($incomeYTD) ?></h2>
   </article>
 </div>
 <script type="module">
   import 'https://unpkg.com/chart.js@4.5.1/dist/chart.umd.min.js';
+  const style = window.getComputedStyle(document.documentElement);
+  const revenueColor = style.getPropertyValue('--pico-blue').trim();
+  const expensesColor = style.getPropertyValue('--pico-pink').trim();
+  const incomeColor = style.getPropertyValue('--pico-jade').trim();
   const monthChartRef = new Chart(document.getElementById('monthChart'), {
     type: 'bar',
     data: {
@@ -72,17 +76,17 @@
         {
           label: 'Revenue',
           data: <?= json_encode($monthData->revenue) ?>,
-          backgroundColor: 'rgba(54, 162, 235, 0.6)',
+          backgroundColor: revenueColor,
         },
         {
           label: 'Expenses',
           data: <?= json_encode($monthData->expenses) ?>,
-          backgroundColor: 'rgba(255, 99, 132, 0.6)',
+          backgroundColor: expensesColor,
         },
         {
           label: 'Income',
           data: <?= json_encode($monthData->income) ?>,
-          backgroundColor: 'rgba(75, 192, 192, 0.6)',
+          backgroundColor: incomeColor,
         }
       ]
     },
@@ -104,17 +108,17 @@
         {
           label: 'Revenue',
           data: <?= json_encode($yearData->revenue) ?>,
-          backgroundColor: 'rgba(54, 162, 235, 0.6)',
+          backgroundColor: revenueColor,
         },
         {
           label: 'Expenses',
           data: <?= json_encode($yearData->expenses) ?>,
-          backgroundColor: 'rgba(255, 99, 132, 0.6)',
+          backgroundColor: expensesColor,
         },
         {
           label: 'Income',
           data: <?= json_encode($yearData->income) ?>,
-          backgroundColor: 'rgba(75, 192, 192, 0.6)',
+          backgroundColor: incomeColor,
         }
       ]
     },
