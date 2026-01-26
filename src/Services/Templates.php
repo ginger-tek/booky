@@ -22,12 +22,13 @@ class Templates extends Service
   {
     $id = \App\Utils::createId();
     $markup ??= '<h1>Invoice Template</h1><div>Invoice Summary: {{ invoice.summary }}</div>{{ itemizationsTable }}';
-    $this->db->run('insert into templates (id, name, markup, userId)
-    VALUES (:id, :name, :markup, :userId)', [
+    $this->db->run('insert into templates (id, name, markup, userId, isDefault)
+    VALUES (:id, :name, :markup, :userId, :isDefault)', [
       ':id' => $id,
       ':name' => $name,
       ':markup' => $markup,
-      ':userId' => $this->uid
+      ':userId' => $this->uid,
+      ':isDefault' => 0
     ]);
     return $this->get($id);
   }

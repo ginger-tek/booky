@@ -17,11 +17,11 @@ class Reports extends Service
     $end = date('Y-m-d', strtotime("$start +1 month"));
     $result = $this->db->run("select coalesce(sum(amountDue),0) as revenue
     from invoices
-    where userId = ? and created between ? and ?", [
-      $this->uid,
-      $start,
-      $end
-    ])->fetch();
+    where userId = ? and dueDate between ? and ?", [
+        $this->uid,
+        $start,
+        $end
+      ])->fetch();
     return (float) $result->revenue;
   }
 
@@ -36,10 +36,10 @@ class Reports extends Service
     where i.userId = ?
     and ii.created between ? and ?
     and ii.type in ('expense')", [
-      $this->uid,
-      $start,
-      $end
-    ])->fetch();
+        $this->uid,
+        $start,
+        $end
+      ])->fetch();
     return (float) $result->totalExpenses;
   }
 
@@ -55,10 +55,10 @@ class Reports extends Service
     and ii.created between ? and ?
     and i.paidDate is not null
     and ii.type in ('expense')", [
-      $this->uid,
-      $start,
-      $end
-    ])->fetch();
+        $this->uid,
+        $start,
+        $end
+      ])->fetch();
     return (float) $result->income;
   }
 
@@ -69,10 +69,10 @@ class Reports extends Service
     $result = $this->db->run("select count(*) as invoiceCount
     from invoices
     where userId = ? and created between ? and ?", [
-      $this->uid,
-      $start,
-      $end
-    ])->fetch();
+        $this->uid,
+        $start,
+        $end
+      ])->fetch();
     return (int) $result->invoiceCount;
   }
 
@@ -82,11 +82,11 @@ class Reports extends Service
     $end = date('Y-m-d', strtotime("$start +1 month"));
     $result = $this->db->run("select count(distinct clientId) as clientCount
     from invoices
-    where userId = ? and created between ? and ?", [
-      $this->uid,
-      $start,
-      $end
-    ])->fetch();
+    where userId = ? and dueDate between ? and ?", [
+        $this->uid,
+        $start,
+        $end
+      ])->fetch();
     return (int) $result->clientCount;
   }
 
@@ -96,11 +96,11 @@ class Reports extends Service
     $end = date('Y-m-d', strtotime("$start +1 year"));
     $result = $this->db->run("select coalesce(sum(amountDue),0) as revenue
     from invoices
-    where userId = ? and created between ? and ?", [
-      $this->uid,
-      $start,
-      $end
-    ])->fetch();
+    where userId = ? and dueDate between ? and ?", [
+        $this->uid,
+        $start,
+        $end
+      ])->fetch();
     return (float) $result->revenue;
   }
 
@@ -115,10 +115,10 @@ class Reports extends Service
     where i.userId = ?
     and ii.created between ? and ?
     and ii.type in ('expense')", [
-      $this->uid,
-      $start,
-      $end
-    ])->fetch();
+        $this->uid,
+        $start,
+        $end
+      ])->fetch();
     return (float) $result->totalExpenses;
   }
 
@@ -134,10 +134,10 @@ class Reports extends Service
     and ii.created between ? and ?
     and i.paidDate is not null
     and ii.type in ('expense')", [
-      $this->uid,
-      $start,
-      $end
-    ])->fetch();
+        $this->uid,
+        $start,
+        $end
+      ])->fetch();
     return (float) $result->income;
   }
 
@@ -147,11 +147,11 @@ class Reports extends Service
     $end = date('Y-m-d', strtotime("$start +1 year"));
     $result = $this->db->run("select count(*) as invoiceCount
     from invoices
-    where userId = ? and created between ? and ?", [
-      $this->uid,
-      $start,
-      $end
-    ])->fetch();
+    where userId = ? and dueDate between ? and ?", [
+        $this->uid,
+        $start,
+        $end
+      ])->fetch();
     return (int) $result->invoiceCount;
   }
 
@@ -161,11 +161,11 @@ class Reports extends Service
     $end = date('Y-m-d', strtotime("$start +1 year"));
     $result = $this->db->run("select count(distinct clientId) as clientCount
     from invoices
-    where userId = ? and created between ? and ?", [
-      $this->uid,
-      $start,
-      $end
-    ])->fetch();
+    where userId = ? and dueDate between ? and ?", [
+        $this->uid,
+        $start,
+        $end
+      ])->fetch();
     return (int) $result->clientCount;
   }
 
@@ -180,10 +180,10 @@ class Reports extends Service
     and ii.created between ? and ?
     and ii.type in ('expense')
     order by ii.created desc", [
-      $this->uid,
-      $start,
-      $end
-    ])->fetchAll();
+        $this->uid,
+        $start,
+        $end
+      ])->fetchAll();
   }
 
   public function getTotalExpenses(string $month): float
@@ -197,10 +197,70 @@ class Reports extends Service
     where i.userId = ?
     and ii.created between ? and ?
     and ii.type in ('expense')", [
+        $this->uid,
+        $start,
+        $end
+      ])->fetch();
+    return (float) $result->totalExpenses;
+  }
+
+  public function getStatsByDate(string $start, string $end, string $groupBy): object
+  {
+    $groupBy = match ($groupBy) {
+      'month' => "strftime('%Y-%m', dueDate)",
+      'week' => "strftime('%Y-%W', dueDate)",
+      default => "strftime('%Y-%m-%d', dueDate)",
+    };
+    $revenue = array_map(fn($row) => (float) $row->revenue, $this->db->run("select coalesce(sum(amountDue),0) as revenue
+    from invoices
+    where userId = ? and dueDate between ? and ?
+    group by $groupBy", [
       $this->uid,
       $start,
       $end
-    ])->fetch();
-    return (float) $result->totalExpenses;
+    ])->fetchAll());
+
+    $groupBy = match ($groupBy) {
+      'month' => "strftime('%Y-%m', ii.created)",
+      'week' => "strftime('%Y-%W', ii.created)",
+      default => "strftime('%Y-%m-%d', ii.created)",
+    };
+    $expenses = array_map(fn($row) => (float) $row->totalExpenses, $this->db->run("
+    select coalesce(sum(ii.amount),0) as totalExpenses
+    from invoice_items ii
+    join invoices i on i.id = ii.invoiceId
+    where i.userId = ?
+    and ii.created between ? and ?
+    and ii.type in ('expense')
+    group by $groupBy", [
+      $this->uid,
+      $start,
+      $end
+    ])->fetchAll());
+
+    $groupBy = match ($groupBy) {
+      'month' => "strftime('%Y-%m', i.paidDate)",
+      'week' => "strftime('%Y-%W', i.paidDate)",
+      default => "strftime('%Y-%m-%d', i.paidDate)",
+    };
+    $income = array_map(fn($row) => (float) $row->income, $this->db->run("
+    select coalesce(case when i.amountPaid != 0 then i.amountPaid else i.amountDue end - sum(ii.amount),0) as income
+    from invoice_items ii
+    join invoices i on i.id = ii.invoiceId
+    where i.userId = ?
+    and ii.created between ? and ?
+    and i.paidDate is not null
+    and ii.type in ('expense')
+    group by $groupBy", [
+      $this->uid,
+      $start,
+      $end
+    ])->fetchAll());
+
+    return (object) [
+      'revenue' => $revenue,
+      'expenses' => $expenses,
+      'income' => $income,
+    ];
   }
 }

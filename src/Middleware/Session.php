@@ -9,8 +9,6 @@ use App\Utils;
 
 class Session
 {
-  private static string $secret = 'potatodemon';
-
   public static function init(Routy $app)
   {
     if ($token = $_COOKIE['token'] ?? null) {

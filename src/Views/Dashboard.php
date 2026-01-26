@@ -17,8 +17,11 @@
 <form action="/dashboard" id="report"></form>
 <div class="flex spread bottom-spacing">
   <h3>Monthly Stats</h3>
-  <input type="month" name="month" form="report" style="width:auto" onchange="report.submit()" value="<?= $month ?>">
+  <input type="month" name="month" form="report" style="width:160px" onchange="report.submit()" value="<?= $month ?>">
 </div>
+<article style="position:relative;width:100%;height:30vh">
+  <canvas id="monthChart"></canvas>
+</article>
 <div class="grid">
   <article align="center">
     <label>Revenue</label>
@@ -33,18 +36,8 @@
     <h2><?= \App\Utils::currency($income) ?></h2>
   </article>
 </div>
-<div class="grid">
-  <article align="center">
-    <label># of Invoices</label>
-    <h2><?= $invoiceCount ?></h2>
-  </article>
-  <article align="center">
-    <label># of New Clients</label>
-    <h2><?= $newClientCount ?></h2>
-  </article>
-</div>
 <div class="flex spread bottom-spacing">
-  <h3>Annual Stats (<?= $year ?>)</h3>
+  <h3>Annual Stats</h3>
   <select name="year" form="report" style="width:auto" onchange="report.submit()">
     <?php $c = date('Y');
     for ($y = $c; $y >= $c - 10; $y--): ?>
@@ -52,6 +45,9 @@
     <?php endfor ?>
   </select>
 </div>
+<article style="position:relative;width:100%;height:30vh">
+  <canvas id="yearChart"></canvas>
+</article>
 <div class="grid">
   <article align="center">
     <label>Revenue</label>
@@ -66,13 +62,70 @@
     <h2><?= \App\Utils::currency($incomeYTD) ?></h2>
   </article>
 </div>
-<div class="grid">
-  <article align="center">
-    <label># of Invoices</label>
-    <h2><?= $invoiceCountYTD ?></h2>
-  </article>
-  <article align="center">
-    <label># of New Clients</label>
-    <h2><?= $newClientCountYTD ?></h2>
-  </article>
-</div>
+<script type="module">
+  import 'https://unpkg.com/chart.js@4.5.1/dist/chart.umd.min.js';
+  const monthChartRef = new Chart(document.getElementById('monthChart'), {
+    type: 'bar',
+    data: {
+      labels: ["<?= join('","', $monthWeeks) ?>"],
+      datasets: [
+        {
+          label: 'Revenue',
+          data: <?= json_encode($monthData->revenue) ?>,
+          backgroundColor: 'rgba(54, 162, 235, 0.6)',
+        },
+        {
+          label: 'Expenses',
+          data: <?= json_encode($monthData->expenses) ?>,
+          backgroundColor: 'rgba(255, 99, 132, 0.6)',
+        },
+        {
+          label: 'Income',
+          data: <?= json_encode($monthData->income) ?>,
+          backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+  const yearChartRef = new Chart(document.getElementById('yearChart'), {
+    type: 'line',
+    data: {
+      labels: ["<?= join('","', $yearMonths) ?>"],
+      datasets: [
+        {
+          label: 'Revenue',
+          data: <?= json_encode($yearData->revenue) ?>,
+          backgroundColor: 'rgba(54, 162, 235, 0.6)',
+        },
+        {
+          label: 'Expenses',
+          data: <?= json_encode($yearData->expenses) ?>,
+          backgroundColor: 'rgba(255, 99, 132, 0.6)',
+        },
+        {
+          label: 'Income',
+          data: <?= json_encode($yearData->income) ?>,
+          backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+</script>

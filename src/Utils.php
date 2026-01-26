@@ -104,4 +104,40 @@ class Utils
       $markup
     );
   }
+
+  public static function getWeeksInMonth(string $month, ?bool $makeFlat = false): array
+  {
+    $weeks = [];
+    $startDate = new \DateTime($month);
+    $startDate->modify('first day of this month');
+    $endDate = clone $startDate;
+    $endDate->modify('last day of this month');
+    while ($startDate <= $endDate) {
+      $weekStart = clone $startDate;
+      $weekEnd = clone $startDate;
+      $weekEnd->modify('next sunday');
+      if ($weekEnd > $endDate) {
+        $weekEnd = clone $endDate;
+      }
+      $weeks[] = $makeFlat ? $weekStart->format('n/j') : [
+        'start' => $weekStart->format('n/j'),
+        'end' => $weekEnd->format('n/j'),
+      ];
+      $startDate->modify('next monday');
+    }
+    return $weeks;
+  }
+
+  public static function getMonths(?bool $nameOnly = false): array
+  {
+    $months = [];
+    $currentYear = date('Y');
+    for ($m = 1; $m <= 12; $m++) {
+      $monthStr = $nameOnly
+        ? date('M', mktime(0, 0, 0, $m, 1))
+        : sprintf('%04d-%02d', $currentYear, $m);
+      $months[] = $monthStr;
+    }
+    return $months;
+  }
 }

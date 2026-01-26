@@ -14,14 +14,20 @@ class Dashboard
     $reportSvc = new Reports($db);
     $month = $app->getQuery('month') ?: date('Y-m');
     $year = $app->getQuery('year') ?: date('Y');
+    $monthData = $reportSvc->getStatsByDate($month, date('Y-m-d', strtotime("$month +1 month")), 'week');
+    $yearData = $reportSvc->getStatsByDate("$year-01-01", date('Y-m-d', strtotime("$year-01-01 +1 year")), 'month');
     $app->render('Dashboard', [
       'month' => $month,
+      'monthWeeks' => \App\Utils::getWeeksInMonth($month, true),
+      'monthData' => $monthData,
       'revenue' => $reportSvc->getMonthRevenue($month),
       'expenses' => $reportSvc->getMonthExpenses($month),
       'income' => $reportSvc->getMonthIncome($month),
       'invoiceCount' => $reportSvc->getMonthInvoiceCount($month),
       'newClientCount' => $reportSvc->getMonthNewClientCount($month),
       'year' => $year,
+      'yearMonths' => \App\Utils::getMonths(true),
+      'yearData' => $yearData,
       'revenueYTD' => $reportSvc->getYearToDateRevenue($year),
       'expensesYTD' => $reportSvc->getYearToDateExpenses($year),
       'incomeYTD' => $reportSvc->getYearToDateIncome($year),

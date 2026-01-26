@@ -66,7 +66,13 @@ class Templates
   public static function postDeleteOne(Routy $app)
   {
     $id = $app->getParam('id');
-    (new TemplatesService)->delete($id);
+    $svc = new TemplatesService;
+    $svc->delete($id);
+    $list = $svc->list();
+    if (count($list) == 1) {
+      $list[0]->isDefault = 1;
+      $svc->update($list[0]->id, get_object_vars($list[0]));
+    }
     $app->redirect("/templates");
   }
 }

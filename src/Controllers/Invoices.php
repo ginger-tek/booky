@@ -85,8 +85,10 @@ class Invoices
     $items = $invSvc->listItems($id);
     ob_start();
     $template = $templateId ? $templatesSvc->get($templateId) : $templatesSvc->getDefault();
-    if (!$template)
-      $template = (object) ['markup' => '<h1>Invoice Template</h1>'];
+    if (!$template || !$template->markup)
+      return $app->render('Error', [
+        'error' => 'Template not found or has no markup'
+      ]);
     $result = \App\Utils::parseMarkup($template->markup, [
       'invoice' => $invoice,
       'client' => $client,

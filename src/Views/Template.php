@@ -3,6 +3,18 @@
  * @var object $template
  */
 ?>
+<dialog id="confirmDelete">
+  <article>
+    <header><b>Confirm Delete</b></header>
+    <p>This action cannot be undone. Are you sure you want to delete this template?</p>
+    <form method="POST" id="delete" action="/templates/<?= $template->id ?>/delete">
+      <div class="flex fill">
+        <button type="button" class="secondary" onclick="confirmDelete.close()">No</button>
+        <button type="submit">Yes, Delete</button>
+      </div>
+    </form>
+  </article>
+</dialog>
 <dialog id="templateHelp">
   <article>
     <header>
