@@ -51,12 +51,12 @@
   <main>
     <?php include $view ?>
   </main>
-  <script type="module">
-    <?php if ($isAuthed): ?>
-      import { startSessionTimer } from '/assets/utils.js'
+  <?php if ($isAuthed): ?>
+    <script type="module">
+      import { startSessionTimer, themeSwitcher } from '/assets/utils.js'
       startSessionTimer()
-    <?php endif ?>
-  </script>
+    </script>
+  <?php endif ?>
 </body>
 
 </html>

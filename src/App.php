@@ -2,6 +2,8 @@
 
 require '../vendor/autoload.php';
 
+define('ROOT', __DIR__ . '/../');
+
 use App\Middleware\Session;
 use App\Controllers\Auth;
 use App\Controllers\Dashboard;
