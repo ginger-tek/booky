@@ -5,37 +5,45 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch built-in server and debug",
+      "name": "Launch built-in server and Debug",
       "type": "php",
       "request": "launch",
+      "noDebug": false,
       "runtimeArgs": [
         "-S",
         "localhost:8000",
         "-t",
-        ".",
-        "-f",
-        "index.php"
+        "."
       ],
-      "port": 9003,
-      "cwd": "${workspaceFolder}/public",
+      "cwd": "${workspaceRoot}/public",
       "serverReadyAction": {
         "action": "openExternally"
-      }
+      },
+      "envFile": "../.env"
     },
     {
-      "name": "Debug current script in console",
+      "name": "Launch built-in server and Profile",
       "type": "php",
       "request": "launch",
-      "program": "${file}",
-      "cwd": "${fileDirname}",
-      "externalConsole": false,
-      "port": 9003
+      "noDebug": true,
+      "runtimeArgs": [
+        "-S",
+        "localhost:8000",
+        "-t",
+        "."
+      ],
+      "cwd": "${workspaceRoot}/public",
+      "serverReadyAction": {
+        "action": "openExternally"
+      },
+      "envFile": "../.env",
+      "profile": true,
+      "openProfile": true
     },
     {
       "name": "Listen for Xdebug",
       "type": "php",
-      "request": "launch",
-      "port": 9003
+      "request": "launch"
     }
   ]
 }
