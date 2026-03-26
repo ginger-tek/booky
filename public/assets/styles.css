@@ -180,6 +180,7 @@ table tr td {
   button,
   [role=button] {
     margin-bottom: 0;
+    white-space: nowrap;
   }
 }
 
