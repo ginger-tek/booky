@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "02c8bb007051eb6eb38176c5706ef440",
+    "content-hash": "faa3a27d48557c13b3be199fe6a2911d",
     "packages": [
         {
             "name": "firebase/php-jwt",
-            "version": "v6.11.1",
+            "version": "v7.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/firebase/php-jwt.git",
-                "reference": "d1e91ecf8c598d073d0995afa8cd5c75c6e19e66"
+                "reference": "28aa0694bcfdfa5e2959c394d5a1ee7a5083629e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/firebase/php-jwt/zipball/d1e91ecf8c598d073d0995afa8cd5c75c6e19e66",
-                "reference": "d1e91ecf8c598d073d0995afa8cd5c75c6e19e66",
+                "url": "https://api.github.com/repos/firebase/php-jwt/zipball/28aa0694bcfdfa5e2959c394d5a1ee7a5083629e",
+                "reference": "28aa0694bcfdfa5e2959c394d5a1ee7a5083629e",
                 "shasum": ""
             },
             "require": {
@@ -65,22 +65,22 @@
             ],
             "support": {
                 "issues": "https://github.com/firebase/php-jwt/issues",
-                "source": "https://github.com/firebase/php-jwt/tree/v6.11.1"
+                "source": "https://github.com/firebase/php-jwt/tree/v7.0.3"
             },
-            "time": "2025-04-09T20:32:01+00:00"
+            "time": "2026-02-25T22:16:40+00:00"
         },
         {
             "name": "ginger-tek/routy",
-            "version": "4.3.0",
+            "version": "4.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ginger-tek/routy.git",
-                "reference": "ab98b51e0b3e789952bb4225d7cd8f28c18e1412"
+                "reference": "fac1897ad3e054de13828565fc1b8b6d57eb2ade"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ginger-tek/routy/zipball/ab98b51e0b3e789952bb4225d7cd8f28c18e1412",
-                "reference": "ab98b51e0b3e789952bb4225d7cd8f28c18e1412",
+                "url": "https://api.github.com/repos/ginger-tek/routy/zipball/fac1897ad3e054de13828565fc1b8b6d57eb2ade",
+                "reference": "fac1897ad3e054de13828565fc1b8b6d57eb2ade",
                 "shasum": ""
             },
             "require": {
@@ -114,18 +114,18 @@
             ],
             "support": {
                 "issues": "https://github.com/ginger-tek/routy/issues",
-                "source": "https://github.com/ginger-tek/routy/tree/4.3.0"
+                "source": "https://github.com/ginger-tek/routy/tree/4.4.0"
             },
-            "time": "2025-11-05T17:30:03+00:00"
+            "time": "2026-03-24T17:12:22+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": {},
-    "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "platform": [],
+    "platform-dev": [],
+    "plugin-api-version": "2.6.0"
 }

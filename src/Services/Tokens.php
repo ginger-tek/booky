@@ -7,8 +7,6 @@ use Firebase\JWT\Key;
 
 class Tokens
 {
-  private static string $secret = 'potatodemon';
-
   /**
    * @return array{token: string, exp: int}
    */
@@ -20,14 +18,14 @@ class Tokens
       'iat' => time(),
       'exp' => $exp,
       ...$data
-    ], self::$secret, 'HS256');
+    ], getenv('TOKEN_SECRET'), 'HS256');
     return [$token, $exp];
   }
 
   public static function decode(string $token): ?object
   {
     try {
-      return JWT::decode($token, new Key(self::$secret, 'HS256'));
+      return JWT::decode($token, new Key(getenv('TOKEN_SECRET'), 'HS256'));
     } catch (\Exception $ex) {
       return null;
     }
