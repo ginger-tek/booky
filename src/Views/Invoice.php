@@ -1,5 +1,4 @@
 <?php
-
 /** 
  * @var object $invoice
  * @var object[] $clients
