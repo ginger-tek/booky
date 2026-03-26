@@ -53,7 +53,7 @@
   </main>
   <?php if ($isAuthed): ?>
     <script type="module">
-      import { startSessionTimer, themeSwitcher } from '/assets/utils.js'
+      import { startSessionTimer } from '/assets/utils.js'
       startSessionTimer()
     </script>
   <?php endif ?>
