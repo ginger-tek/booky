@@ -1,15 +1,26 @@
 {
     "name": "ginger-tek/booky",
-    "description": "A small, simple book-keeping app for making invoices and tracking expenses",
-
+    "description": "Simple, self-hosted book-keeping app",
     "type": "project",
-    "require": {
-        "php": "^8.2",
-        "ginger-tek/routy": "^3.6"
-    },
     "authors": [
         {
-            "name": "ginger-tek"
+            "name": "GingerTek",
+            "homepage": "https://github.com/ginger-tek"
         }
-    ]
+    ],
+    "license": "ISC",
+    "require": {
+        "firebase/php-jwt": "^7.0",
+        "ginger-tek/routy": "^4.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "php src/Cli.php init-db"
+        ]
+    }
 }

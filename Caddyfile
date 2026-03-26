@@ -1,0 +1,8 @@
+http://localhost:8080 {
+	root ./public
+	file_server
+	php_fastcgi unix//data/data/com.termux/files/usr/var/run/php-fpm.sock {
+		try_files {path} /index.php
+		capture_stderr
+	}
+}
