@@ -6,7 +6,6 @@ use GingerTek\Routy;
 use App\Services\Users;
 use App\Services\Tokens;
 use App\Services\Templates;
-use App\Utils;
 use App\Data\Database;
 
 class Auth
